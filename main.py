@@ -40,14 +40,18 @@ class RegisteredStudents:
 
 class SubSystem:
     def __init__(self):
-        option = input("Enter s for student or a for admin: ")
-        if option == 's':
-            print('Student')
-            Register()
-        elif option == 'a':
-            print('admin')
-        else:
-            print('Invalid option')
+        while True:
+            option = input("Enter 's' for student or 'a' for admin or 'e' for exit: ")
+            if option == 's':
+                print('Student')
+                Register()
+            elif option == 'a':
+                print('admin')
+            elif option == 'e':
+                print('exit')
+                break
+            else:
+                print('Invalid option')
 
 
 # Main execution
