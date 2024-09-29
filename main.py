@@ -1,5 +1,9 @@
 import json
+from colorama import Fore, Style
 from json.decoder import JSONDecodeError
+from AdminSubSystem import AdminSubSystem
+from Database import Database
+from StudentSubSystem import StudentSubSystem
 
 class Register: 
     def __init__(self):
@@ -36,26 +40,22 @@ class RegisteredStudents:
                 json.dump(self.studentList, s, indent=4)
         except json.decoder.JSONDecodeError:
             pass
-       
-
-class SubSystem:
-    def __init__(self):
-        while True:
-            option = input("Enter 's' for student or 'a' for admin or 'e' for exit: ")
-            if option == 's':
-                print('Student')
-                Register()
-            elif option == 'a':
-                print('admin')
-            elif option == 'e':
-                print('exit')
-                break
-            else:
-                print('Invalid option')
-
 
 # Main execution
 if __name__ == "__main__":
-    subSystem=SubSystem()
-
-
+    while True:
+        database = Database("student_list.json")
+        option = input(Style.RESET_ALL + "Enter 's' for student or 'a' for admin or 'e' for exit: ")
+        if option == 's':
+            print(Fore.BLUE + 'Student')
+            student_console = StudentSubSystem(database)
+            student_console.launch()
+        elif option == 'a':
+            print(Fore.YELLOW + 'admin')
+            admin_console = AdminSubSystem(database)
+            admin_console.launch()
+        elif option == 'e':
+            print('exit')
+            break
+        else:
+            print(Fore.RED + 'Invalid option')
