@@ -17,7 +17,7 @@ if __name__ == "__main__":
             admin_console = AdminSubSystem(database)
             admin_console.launch()
         elif option == 'e':
-            print('exit')
+            print('Exiting System')
             break
         else:
             print(Fore.RED + 'Invalid option')
