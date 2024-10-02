@@ -9,11 +9,9 @@ if __name__ == "__main__":
         database = Database("student_list.json")
         option = input(Style.RESET_ALL + "Enter 's' for student or 'a' for admin or 'e' for exit: ")
         if option == 's':
-            print(Fore.BLUE + 'Student')
             student_console = StudentSubSystem(database)
             student_console.launch()
         elif option == 'a':
-            print(Fore.YELLOW + 'admin')
             admin_console = AdminSubSystem(database)
             admin_console.launch()
         elif option == 'e':

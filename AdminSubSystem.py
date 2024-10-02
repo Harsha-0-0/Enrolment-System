@@ -1,24 +1,46 @@
+from colorama import Fore
 from SubSystem import SubSystem
 
 class AdminSubSystem(SubSystem):
     def __init__(self, database):
         super().__init__(database)
     def launch(self):
-        print("Welcome to Admin SubSystem ")
+        print(Fore.BLUE + "Welcome to Admin SubSystem ")
         while True:
-            option = input("(1) View all Students, (2) Remove Student, (3) View all Subjects, (4) Add Subject, (5) Clear Student Database, (99) ExitSubSystem: ")
+            option = input("(1) View all Students, (2) Remove Student, (3) View all Subjects, (4) Create Subject, (5) View by Grade, (6) Clear Student Database, (99) ExitSubSystem: ")
             if option == '1':
-                print('test 1')
+                self.view_all_student_prompt()
             elif option == '2':
-                print('test2')
+                self.remove_student_prompt()
             elif option == '3':
-                print('test3')
+                self.view_all_subjects_prompt()
             elif option == '4':
-                print('test4')
+                self.create_subject_prompt()
             elif option == '5':
-                print('test5')            
+                self.view_by_grade_prompt()
+            elif option == '6':
+                self.clear_database_prompt()            
             elif option == '99':
                 print('Exiting SubSystem')
                 break
             else:
                 print('Invalid option')    
+    def view_all_student_prompt(self):
+        print('Hello1') 
+        # TODO UserStory-401 @Harsha, View list of all registered students
+    def remove_student_prompt(self):
+        print('Hello2') 
+        # TODO UserStory-404, Remove individual students from the system
+    def view_all_subjects_prompt(self):
+        print('Hello3') 
+        # TODO @, 
+    def create_subject_prompt(self):
+        print('Hello4') 
+        # TODO @, 
+    def view_by_grade_prompt(self):
+        print('Hello5') 
+        # TODO UserStory-402, Organize and view students by grade
+        # TODO UserStory-403, Categorize students as PASS or FAIL based on marks
+    def clear_database_prompt(self):
+        print("Hello6") 
+        # TODO UserStory-405, Clear the entire students.data file from the system
