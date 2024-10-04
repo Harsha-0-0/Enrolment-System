@@ -1,6 +1,7 @@
 from colorama import Fore
 from SubSystem import SubSystem
 import json
+from Stduent.Student import student
 
 class StudentSubSystem(SubSystem):
     def __init__(self, database):
@@ -25,6 +26,20 @@ class StudentSubSystem(SubSystem):
         # TODO UserStory-103, Validate password against displayed criteria
         # TODO UserStory-103, Automatically generate a unique 6-digits student ID during registration
         # TODO UserStory-107, Add name to student
+        stu =  student()
+        passw = 'password here'
+        emailadd = 'email add here'
+        if not stu.verify_student_email(emailadd):
+            print('invalid email address')
+            # may need to re-enter the email address
+        if not stu.verify_student_password(passw):
+            print('invalid password format')
+            # may need to re-enter the password
+
+        stu.set_name('any_name')
+
+        # generate unique student id, need get current number of students or ids
+
     def login_student_prompt(self):
         self.print_line('Hello2') 
         # TODO UserStory-105, Log in with registered email and password
@@ -94,3 +109,8 @@ class RegisteredStudents:
                 json.dump(self.studentList, s, indent=4)
         except json.decoder.JSONDecodeError:
             pass
+
+if __name__ == '__main__':
+    stu = student()
+    stu.set_name('lol')
+    print(stu.name)

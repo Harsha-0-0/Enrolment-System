@@ -1,5 +1,6 @@
 from colorama import Fore
 from SubSystem import SubSystem
+from Subject.Subject import subject
 
 class AdminSubSystem(SubSystem):
     def __init__(self, database):
@@ -37,6 +38,8 @@ class AdminSubSystem(SubSystem):
     def create_subject_prompt(self):
         self.print_line('Hello4') 
         # TODO @, 
+        sub = subject()
+        sub.set_subject_name('any_name')
     def view_by_grade_prompt(self):
         self.print_line('Hello5') 
         # TODO UserStory-402, Organize and view students by grade
