@@ -46,8 +46,4 @@ class AdminSubSystem(SubSystem):
         # TODO UserStory-403, Categorize students as PASS or FAIL based on marks
     def clear_database_prompt(self):
         self.print_line("Hello6") 
-<<<<<<< HEAD
         # TODO UserStory-405, Clear the entire students.data file from the system
-=======
-        # TODO UserStory-405, Clear the entire students.data file from the system
->>>>>>> origin/main
