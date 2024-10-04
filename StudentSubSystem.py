@@ -65,8 +65,12 @@ class StudentSubSystem(SubSystem):
         # TODO UserStory-301, View list of enrolled subjects 
     def enrol_in_subject_prompt(self):
         self.print_line('Hello2')
+<<<<<<< HEAD
         # TODO UserStory-201, Automatically Enrol in subjects   
           
+=======
+        # TODO UserStory-201, Automatically Enrol in subjects     
+>>>>>>> origin/main
     def withdraw_from_subject_prompt(self):
         self.print_line('Hello3')
         # TODO UserStory-302, Remove a subject from enrolment list  
@@ -97,7 +101,11 @@ class RegisteredStudents:
     
     def __checkStudent__(self):
         if self.email in self.studentList:
+<<<<<<< HEAD
             self.print('Email ID already exists. Please log in or Register with new Email ID \n')
+=======
+            print_line('Email ID already exists. Please log in or Register with new Email ID')
+>>>>>>> origin/main
         else:
             self.add_student()
 
