@@ -34,6 +34,7 @@ class Database:
             "subjects": []
         }
 
+    # TODO - Should check if there's already a student with the same StudentId or Email and if there is return false, dont forget to add self._save_changes_to_data_file()
     def register_student(student: Student) -> bool:
         return False
 
@@ -42,16 +43,19 @@ class Database:
         self.data['subjects'].append(subject.model_dump())
         self._save_changes_to_data_file()
 
+    # TODO - Find student, find subject, check if the student is already enrolled or not, use _limit_enrolment(), create enrolment, dont forget to add self._save_changes_to_data_file()
     def enrol_student(self, student_id: str, subject_id: int) -> bool:
         return False
 
     def _limit_enrolment(self, current_enrolment_count: int) -> bool:
         return False
 
+    # TODO - Just make sure it doesn't have duplicates, can be any int, it is possible this field is unnessary
     def generate_enrolment_id(self) -> int:
         return 0
 
-    def generate_student_id(self) -> int:
+    # TODO - Should get all existing student_ids, maybe convert to int and find the highest number and then pad the leading zero and then ensure there is no duplicate and return
+    def generate_student_id(self) -> str:
         return 0
 
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
@@ -71,6 +75,7 @@ class Database:
 
         return new_subject_id
 
+    # TODO - Maybe return sorted by student_id
     def view_student_list(self) -> List[Student]:
         return None
 
@@ -87,25 +92,32 @@ class Database:
         # Sort the subjects by subject_id
         return sorted(subjects, key=lambda subject: subject.subject_id)
 
-    def view_enrolled_subjects(self, excluded_subject_ids: List[int]) -> List[Enrolment]:
+    # TODO - Should return a list of enroled subjects for the student
+    def view_enrolled_subjects(self, student_id: int) -> List[Enrolment]:
         return None
 
+    # TODO - Could be used just to return the particular subject's name
     def get_subject(self, subject_id: int) -> Subject:
         return None
 
+    # TODO - Just match on Email/Password or return null
     def login_student(self, email: str, password: str) -> Student:
         return None
 
+    # TODO - Returns false if no match, don't forget to add self._save_changes_to_data_file()
     def remove_student(self, student_id: str) -> bool:
         return False
 
+    # TODO - Returns false if no match, don't forget to add self._save_changes_to_data_file()
     def change_student_pw(self, student_id: str, new_password: str) -> bool:
         return False
 
+    # TODO - Should return a list of enroled subjects for the student
     def view_enrolled_subjects(self, student_id: str) -> List[Enrolment]:
         return None
 
-    def unenrol_student(self, student_id: str) -> bool:
+    # TODO - Find student, find enrolment with the with subject_id, don't forget to add self._save_changes_to_data_file()
+    def unenrol_student(self, student_id: str, subject_id: int) -> bool:
         return False
 
     # Save the data back to the file

@@ -10,7 +10,7 @@ class AdminSubSystem(SubSystem):
         super().__init__(database, Fore.BLUE)
 
     def launch(self):
-        self.print_line("Welcome to Admin SubSystem ")
+        self.print_line("Welcome to Admin SubSystem")
         while True:
             option = input(
                 "(1) View all Students, (2) Remove Student, (3) View all Subjects, (4) Create Subject, (5) View by Grade, (6) Clear Student Database, (99) ExitSubSystem: ")

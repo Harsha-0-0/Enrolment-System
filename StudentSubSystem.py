@@ -28,8 +28,6 @@ class StudentSubSystem(SubSystem):
     # TODO UserStory-103, Automatically generate a unique 6-digits student ID during registration
     # TODO UserStory-107, Add name to student
     def register_student_prompt(self):
-        self.print_line("Hello1")
-
         stu = Student()
         passw = "password here"
         emailadd = "email add here"
@@ -47,8 +45,6 @@ class StudentSubSystem(SubSystem):
     # TODO UserStory-105, Log in with registered email and password
     # TODO UserStory-106, Display specific error messages for incorrect login details
     def login_student_prompt(self):
-        self.print_line("Hello2")
-
         self.print_line("Login Successful")
         while True:
             option = input(
@@ -69,19 +65,19 @@ class StudentSubSystem(SubSystem):
 
     # TODO UserStory-301, View list of enrolled subjects
     def view_my_enrolments_prompt(self):
-        self.print_line("Hello1")
+        self.print_line("UserStory-301, View list of enrolled subjects")
 
     # TODO UserStory-201, Automatically Enrol in subjects
     def enrol_in_subject_prompt(self):
-        self.print_line("Hello2")
+        self.print_line("UserStory-201, Automatically Enrol in subjects")
 
     # TODO UserStory-302, Remove a subject from enrolment list
     def withdraw_from_subject_prompt(self):
-        self.print_line("Hello3")
+        self.print_line("UserStory-302, Remove a subject from enrolment list")
 
     # TODO UserStory-205, Change the password
     def change_password_prompt(self):
-        self.print_line("Hello4")
+        self.print_line("UserStory-205, Change the password")
 
 
 class Register:
