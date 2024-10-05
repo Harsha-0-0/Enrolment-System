@@ -1,0 +1,17 @@
+{
+    "students": [],
+    "subjects": [
+        {
+            "subject_id": 148,
+            "subject_name": "English"
+        },
+        {
+            "subject_id": 103,
+            "subject_name": "Math"
+        },
+        {
+            "subject_id": 567,
+            "subject_name": "Software Development"
+        }
+    ]
+}

@@ -1,6 +1,9 @@
 import datetime
 import random
-class entrolment:
+from pydantic import BaseModel
+
+
+class Enrolment(BaseModel):
     def __init__(self, subject, student) -> None:
         self.entrolment_id = None
         self.entrolment_date = None
@@ -11,7 +14,7 @@ class entrolment:
 
         self._assign_marks()
         self._calculate_grade()
-        
+
     def _assign_marks(self):
         self.mark = random.randint(25, 100)
 
