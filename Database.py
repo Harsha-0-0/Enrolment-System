@@ -35,7 +35,7 @@ class Database:
         }
 
     # TODO - Should check if there's already a student with the same StudentId or Email and if there is return false, dont forget to add self._save_changes_to_data_file()
-    def register_student(student: Student) -> bool:
+    def register_student(self, student: Student) -> bool:
         return False
 
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
