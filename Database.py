@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from Enrolment.Enrolment import Enrolment
 from Student.Student import Student
 from Subject.Subject import Subject
-
+import numpy as np
 
 class Database:
     def __init__(self, db_file_name):
@@ -40,7 +40,7 @@ class Database:
 
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
     def create_subject(self, subject):
-        self.data['subjects'].append(subject.model_dump())
+        self.data['subjects'].append(subject.model_dump()) # serialization
         self._save_changes_to_data_file()
 
     # TODO - Find student, find subject, check if the student is already enrolled or not, use _limit_enrolment(), create enrolment, dont forget to add self._save_changes_to_data_file()
@@ -56,24 +56,36 @@ class Database:
 
     # TODO - Should get all existing student_ids, maybe convert to int and find the highest number and then pad the leading zero and then ensure there is no duplicate and return
     def generate_student_id(self) -> str:
-        return 0
+
+        existing_ids = {student['student_id'] for student in self.data['students']}
+        least_available_id = 1 # id start from zero or one ??
+        for least_available_id in existing_ids:
+            existing_ids += 1
+        return least_available_id
 
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
     def create_subject_id(self) -> int:
-        new_subject_id = 0
+        # new_subject_id = -1
         # Extract IDs from dictionaries
         existing_ids = {subject['subject_id'] for subject in self.data['subjects']}
+        # return the least availble id 
+        least_available_id = 1 
+        for least_available_id in existing_ids:
+            existing_ids += 1
+        return least_available_id
+    # TODO Follow up with tutor about requirement to add leading zeros or start with 100 as min number?
+    # if start from zero, we might need str type for id, for simplicity, 100 is favorable
+        # while True:
+        #     # Generate a random number between 1 and 999 #
+        #     # randint is inclusive on both ends
+            
+        #     new_subject_id = random.randint(1, 999)
 
-        while True:
-            # Generate a random number between 1 and 999 #TODO Follow up with tutor about requirement to add leading zeros or start with 100 as min number?
-            # randint is inclusive on both ends
-            new_subject_id = random.randint(1, 999)
+        #     # Check if the ID is unique
+        #     if new_subject_id not in existing_ids:
+        #         break  # Unique ID found, exit loop
 
-            # Check if the ID is unique
-            if new_subject_id not in existing_ids:
-                break  # Unique ID found, exit loop
-
-        return new_subject_id
+        # return new_subject_id
 
     # TODO - Maybe return sorted by student_id
     def view_student_list(self) -> List[Student]:
