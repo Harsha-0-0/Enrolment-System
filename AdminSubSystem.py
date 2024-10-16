@@ -1,5 +1,7 @@
+import json
 from colorama import Fore
-from tabulate import tabulate
+import pandas as pd
+from tabulate import tabulate 
 from Database import Database
 from SubSystem import SubSystem
 from Subject.Subject import Subject
@@ -34,11 +36,39 @@ class AdminSubSystem(SubSystem):
 
     # TODO UserStory-401 @Harsha, View list of all registered students
     def view_all_student_prompt(self):
-        self.print_line("UserStory-401, View list of all registered students")
+        try:
+            with open("data_file.json", 'r') as s:                      
+                self.studentList = json.loads(s.read())
+        except json.decoder.JSONDecodeError:
+            pass
+        student_list = self.studentList['students']
+        # TO show only selected columns, used Pandas, Dataframe 
+        cols = ['student_id', 'student_name', 'student_mail']
+        df = pd.DataFrame(data=student_list, columns=cols)        
+        self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
 
     # TODO UserStory-404, Remove individual students from the system
     def remove_student_prompt(self):
-        self.print_line("UserStory-404, Remove individual students from the system")
+
+        try:
+            with open("data_file.json", 'r') as s:                      
+                self.studentList = json.loads(s.read())
+        except json.decoder.JSONDecodeError:
+            pass
+        student_id = input('Enter the ID of student you want to delete: ')
+        student_list = self.studentList['students']
+        id_list = [d['student_id'] for d in student_list]
+        if(student_id in id_list):
+            index = id_list.index(student_id)
+            self.studentList['students'].pop(index)
+            try:                
+                with open("data_file.json", 'w') as w:
+                    json.dump(self.studentList, w, indent=4)   
+                    self.print_line("Deleted successfully!")                                 
+            except json.decoder.JSONDecodeError:
+                pass
+            
+            self.print_line(tabulate(student_list , tablefmt="github", headers="keys"))
 
     def view_all_subjects_prompt(self):
         subjects = self.database.get_all_subjects()
