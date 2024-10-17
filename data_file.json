@@ -1,17 +1,35 @@
 {
-    "students": [],
+    "students": [
+        {
+            "student_id": "000001",
+            "student_name": "lol lol",
+            "student_password": "A12312asdasdadasd",
+            "student_email": "lol.lol@university.com",
+            "registered_date": "2024-10-17"
+        },
+        {
+            "student_id": "000003",
+            "student_name": "john hammer",
+            "student_password": "HH23123asdasdad",
+            "student_email": "john.hammer@university.com",
+            "registered_date": "2024-10-17"
+        }
+    ],
     "subjects": [
         {
-            "subject_id": 148,
-            "subject_name": "English"
+            "subject_id": "001",
+            "subject_name": "tt"
         },
         {
-            "subject_id": 103,
-            "subject_name": "Math"
+            "subject_id": "002",
+            "subject_name": "asdasd"
         },
         {
-            "subject_id": 567,
-            "subject_name": "Software Development"
+            "subject_id": "003",
+            "subject_name": "kaddfhjkwdbvksa"
         }
+    ],
+    "enrolment":[
+        
     ]
 }
