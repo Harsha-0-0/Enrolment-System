@@ -35,13 +35,18 @@ class Database:
         }
 
     # TODO - Should check if there's already a student with the same StudentId or Email and if there is return false, dont forget to add self._save_changes_to_data_file()
-    def register_student(self, student: Student) -> bool:
-        return False
+    def save_student(self, student: Student) -> bool:
+        self.data['students'].append(student.model_dump()) # serialization
+        self._save_changes_to_data_file()
 
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
-    def create_subject(self, subject):
+    def save_subject(self, subject):
         self.data['subjects'].append(subject.model_dump()) # serialization
         self._save_changes_to_data_file()
+    # niki    
+    def check_email_existence(self, email):
+        exist_emails = {student['student_email'] for student in self.data['students']}
+        return email in exist_emails
 
     # TODO - Find student, find subject, check if the student is already enrolled or not, use _limit_enrolment(), create enrolment, dont forget to add self._save_changes_to_data_file()
     def enrol_student(self, student_id: str, subject_id: int) -> bool:
@@ -54,39 +59,8 @@ class Database:
     def generate_enrolment_id(self) -> int:
         return 0
 
-    # TODO - Should get all existing student_ids, maybe convert to int and find the highest number and then pad the leading zero and then ensure there is no duplicate and return
-    def generate_student_id(self) -> str:
-
-        existing_ids = {student['student_id'] for student in self.data['students']}
-        least_available_id = 1 # id start from zero or one ??
-        for least_available_id in existing_ids:
-            existing_ids += 1
-        return least_available_id
-
-    # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
-    def create_subject_id(self) -> int:
-        # new_subject_id = -1
-        # Extract IDs from dictionaries
-        existing_ids = {subject['subject_id'] for subject in self.data['subjects']}
-        # return the least availble id 
-        least_available_id = 1 
-        for least_available_id in existing_ids:
-            existing_ids += 1
-        return least_available_id
-    # TODO Follow up with tutor about requirement to add leading zeros or start with 100 as min number?
-    # if start from zero, we might need str type for id, for simplicity, 100 is favorable
-        # while True:
-        #     # Generate a random number between 1 and 999 #
-        #     # randint is inclusive on both ends
-            
-        #     new_subject_id = random.randint(1, 999)
-
-        #     # Check if the ID is unique
-        #     if new_subject_id not in existing_ids:
-        #         break  # Unique ID found, exit loop
-
-        # return new_subject_id
-
+    # # TODO - Should get all existing student_ids, maybe convert to int and find the highest number and then pad the leading zero and then ensure there is no duplicate and return, done NIKI
+    
     # TODO - Maybe return sorted by student_id
     def view_student_list(self) -> List[Student]:
         return None
@@ -110,6 +84,9 @@ class Database:
 
     # TODO - Could be used just to return the particular subject's name
     def get_subject(self, subject_id: int) -> Subject:
+        for sub in self.data['subjects']:
+            if sub['subject_id'] == subject_id:
+                return sub['subject_name']
         return None
 
     # TODO - Just match on Email/Password or return null
