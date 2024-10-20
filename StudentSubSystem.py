@@ -89,7 +89,7 @@ class StudentSubSystem(SubSystem):
 
                     pwd_list = [d['password'] for d in student_list]
                     pwd = pwd_list[index]
-                    
+
                     if(pwd == self.password):
                         self.print_line('Login Successful')
                         break

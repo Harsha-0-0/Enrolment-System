@@ -66,13 +66,13 @@ class Database:
 
     # TODO - Should get all existing student_ids, maybe convert to int and find the highest number and then pad the leading zero and then ensure there is no duplicate and return
     def generate_student_id(self) -> str:
-
+        
         existing_ids = {student['student_id'] for student in self.data['students']}
         least_available_id = 1 # id start from zero or one ??
         for least_available_id in existing_ids:
             existing_ids += 1
         return least_available_id
-
+    
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
     def create_subject_id(self) -> int:
         # new_subject_id = -1
@@ -90,13 +90,13 @@ class Database:
         #     # randint is inclusive on both ends
             
         #     new_subject_id = random.randint(1, 999)
-
+        
         #     # Check if the ID is unique
         #     if new_subject_id not in existing_ids:
         #         break  # Unique ID found, exit loop
-
+        
         # return new_subject_id
-
+    
     # TODO - Maybe return sorted by student_id
     def view_student_list(self) -> List[Student]:
         return None

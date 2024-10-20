@@ -67,7 +67,7 @@ class AdminSubSystem(SubSystem):
                     self.print_line("Deleted successfully!")                                 
             except json.decoder.JSONDecodeError:
                 pass
-            
+
             self.print_line(tabulate(student_list , tablefmt="github", headers="keys"))
 
     def view_all_subjects_prompt(self):
@@ -104,4 +104,3 @@ class AdminSubSystem(SubSystem):
     # TODO UserStory-405, Clear the entire students.data file from the system
     def clear_database_prompt(self):
         self.database.clear_student_file()
-        self.print_line("Data has been cleared from the file")
