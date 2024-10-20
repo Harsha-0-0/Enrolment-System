@@ -1,15 +1,18 @@
+import random
 import re
+from typing import Optional
 from pydantic import BaseModel
+
+import Database
 
 
 class Student(BaseModel):
-    def __init__(self, **kwarg) -> None:
-        self.student_id = None
-        self.name = None
-        self.password = None
-        self.email = None
-        self.registered_date = None
-        self.enrolments = None
+    student_id: Optional[str] = None
+    name: Optional[str] = None
+    password: Optional[str] = None
+    email: Optional[str] = None
+    registered_date: Optional[str] = None
+    enrolments: Optional[str] = None
 
     def set_name(self, name):
         self.name = name
@@ -20,32 +23,29 @@ class Student(BaseModel):
 
     def verify_student_email(self, email):
         # if true assign value, else return false
-        if email.split('@')[-1] == 'university.com':
+        if re.match(r'^[a-zA-Z]+[.][a-zA-Z]+@university.com$', email):
             self.email = email
             return True
         else:
             return False
 
-    def verify_student_password(self, passwd):
+    def verify_student_password(self, password):
         # if true assign value, else return false
-        if len(''.join(re.findall(r'\d+', passwd))) < 3:
-            # less than 3 digits
-            return False
-        if len(''.join(re.findall(r'[A-Za-z]+', passwd))) < 5:
-            # less than five letters
-            return False
-        if passwd[0].islower():
+        if re.match(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$', password):
+            self.password = password
+            return True
+        else:
             return False
 
-        self.password = passwd
-
-    def _gen_sid(self, cur_id):
+    def generate_student_id(self, student_list):
         # niki TODO
         # count length of number of subject ids generated in database, and then return 3 digit number in string format
 
-        if len(cur_id + 1) > 999999:
-            raise Exception('run out of available student ids ~~')
-
-        self.student_id = format(cur_id + 1, '06d')
-
-        return cur_id
+        while True:
+            ids = [d['student_id'] for d in student_list]
+            uid = str(random.randint(100000, 999999))
+            
+            if uid not in ids:  
+                self.student_id = uid
+                return self.student_id
+    
