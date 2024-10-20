@@ -1,23 +1,19 @@
-from datetime import datetime
+import datetime
 import random
 from pydantic import BaseModel
 
-from typing import Optional
 
 class Enrolment(BaseModel):
+    def __init__(self, subject, student) -> None:
+        self.entrolment_id = None
+        self.entrolment_date = None
+        self.mark = None
+        self.grade = None
+        self.subject = subject
+        self.student = student
 
-    entrolment_id : Optional[str] = None
-    entrolment_date : str = None
-    mark : Optional[int] = None 
-    grade : Optional[str] = None
-    subject : Optional[str] = None
-    student: Optional[str] = None
-
-    def __init__(self,):  
-            super().__init__()  
-            self._assign_marks()
-            self.grade = self._calculate_grade()
-            self.entrolment_date = datetime.today().strftime('%Y-%m-%d') 
+        self._assign_marks()
+        self._calculate_grade()
 
     def _assign_marks(self):
         self.mark = random.randint(25, 100)
@@ -33,7 +29,3 @@ class Enrolment(BaseModel):
             self.grade = 'D'
         else:
             self.grade = 'HD'
-
-
-if __name__ == '__main__':
-    print(Enrolment())

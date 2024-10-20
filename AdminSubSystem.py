@@ -43,7 +43,7 @@ class AdminSubSystem(SubSystem):
             pass
         student_list = self.studentList['students']
         # TO show only selected columns, used Pandas, Dataframe 
-        cols = ['student_id', 'student_name', 'student_email']
+        cols = ['student_id', 'student_name', 'student_mail']
         df = pd.DataFrame(data=student_list, columns=cols)        
         self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
 
@@ -67,7 +67,7 @@ class AdminSubSystem(SubSystem):
                     self.print_line("Deleted successfully!")                                 
             except json.decoder.JSONDecodeError:
                 pass
-            
+
             self.print_line(tabulate(student_list , tablefmt="github", headers="keys"))
 
     def view_all_subjects_prompt(self):
@@ -87,13 +87,13 @@ class AdminSubSystem(SubSystem):
         self.print_line(tabulate(subject_list, headers=headers, tablefmt="pretty"))
 
     def create_subject_prompt(self):
-        sub = Subject()
+        subject_id = self.database.create_subject_id()
+        sub = Subject(subject_id=subject_id)
         subject_name = input("Enter Subject Name: ")
-        while not sub.set_subject_name(subject_name):
+        if sub.set_subject_name(subject_name):
+            self.database.create_subject(sub)
+        else:
             self.print_error("Invalid, please try again")
-            subject_name = input("Enter Subject Name: ")
-        sub._gen_subid(self.database.data['subjects'])
-        self.database.save_subject(sub)
 
     # TODO UserStory-402, Organize and view students by grade
     # TODO UserStory-403, Categorize students as PASS or FAIL based on marks
@@ -104,4 +104,3 @@ class AdminSubSystem(SubSystem):
     # TODO UserStory-405, Clear the entire students.data file from the system
     def clear_database_prompt(self):
         self.database.clear_student_file()
-        self.print_line("Data has been cleared from the file")
