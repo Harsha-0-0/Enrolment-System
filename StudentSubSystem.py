@@ -1,9 +1,8 @@
 import json
-import random
-import re
 from colorama import Fore
 from SubSystem import SubSystem
 from Student.Student import Student
+from datetime import datetime
 
 
 class StudentSubSystem(SubSystem):
@@ -30,31 +29,17 @@ class StudentSubSystem(SubSystem):
     # TODO UserStory-103, Automatically generate a unique 6-digits student ID during registration
     # TODO UserStory-107, Add name to student
     def register_student_prompt(self):
-        # stu = Student()
-        # passw = "password here"
-        # emailadd = "email add here"
-        # if not stu.verify_student_email(emailadd):
-        #     print("invalid email address")
-        #     # may need to re-enter the email address
-        # if not stu.verify_student_password(passw):
-        #     print("invalid password format")
-        #     # may need to re-enter the password
-        
-        # stu.set_name("any_name")
-        
         while True:
+            student = Student()
             self.print_line('Please enter email and password to register')
             self.email = input("Enter email: ")
             self.password = input("Enter Password: ") 
             self.name = input("Enter Name: ")
-            if re.match(r'^[a-zA-Z]+[.][a-zA-Z]+@university.com$', self.email):
-                valid_mail = True
-            else:
-                valid_mail = False
-            if re.fullmatch(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$', self.password):
-                valid_pwd = True
-            else:
-                valid_pwd = False
+            
+            #verifying the mail and password
+            valid_mail = student.verify_student_email(self.email)
+            valid_pwd = student.verify_student_password(self.password)
+                
             if valid_mail and valid_pwd:
                 break
             elif not valid_mail and not valid_pwd:
@@ -63,43 +48,27 @@ class StudentSubSystem(SubSystem):
                 self.print_error('The email address is not valid. Please try again.')
             elif not valid_pwd:
                 self.print_error('The password is not valid. Please try again.')
+
+        #setting values to student
+        student.email = self.email
+        student.password = self.password
+        student.name = self.name
         
-        
-        self.studentList = dict()
-        
-        #Reading from data_file.json file
-        try:
-            with open("data_file.json", 'r') as s:                      
-                self.studentList = json.loads(s.read())
-        except json.decoder.JSONDecodeError:
-            pass
-        
-        #Check if student exists. If it is a new email, add to the data_file.json file
-        
-        student_list = self.studentList['students']
-        email_list = [d['student_mail'] for d in student_list]
-        
+        #Getting data from data_file.json
+        self.data = self.database.get_data()
+
+        #Check if student exists. If it is a new email, create generate student id and add to the data_file.json file
+        student_list = self.data['students']
+        email_list = [d['email'] for d in student_list]
+
         if self.email in email_list:
             self.print_error('Email ID already exists. Please log in or Register with new Email ID')            
-        else:
+        else:   
+            student.student_id = student.generate_student_id(student_list)
+            student.registered_date = datetime.now().strftime('%Y-%m-%d')
+            self.database.register_student(student)
+            self.print_line("Registered successfully!") 
             
-            while True:
-                ids = [d['student_id'] for d in student_list]
-                uid = str(random.randint(100000, 999999))
-            
-                if uid not in ids:  
-                    Student_id = uid
-                    break
-                
-            new = {"student_id":Student_id, "student_name":self.name, "student_mail":self.email, "student_password":self.password}
-            try:                
-                with open("data_file.json", 'w') as s:
-                    self.studentList['students'].append(new)
-                    json.dump(self.studentList, s, indent=4)   
-                    self.print_line("Registered successfully!")                                  
-            except json.decoder.JSONDecodeError:
-                pass
-        # generate unique student id, need get current number of students or ids
 
     # TODO UserStory-105, Log in with registered email and password
     # TODO UserStory-106, Display specific error messages for incorrect login details
@@ -109,20 +78,16 @@ class StudentSubSystem(SubSystem):
             self.email = input("Enter email: ")
             self.password = input("Enter Password: ") 
             if self.email and self.password != '':
-                 #Reading from student_list.json file
-                try:
-                    with open("data_file.json", 'r') as s:                      
-                        self.studentList = json.loads(s.read())
-                except json.decoder.JSONDecodeError:
-                    pass
-                student_list = self.studentList['students']
-                email_list = [d['student_mail'] for d in student_list]
+                 #Reading data from data_file.json
+                self.data = self.database.get_data()
+                student_list = self.data['students']
+                email_list = [d['email'] for d in student_list]
                 if(self.email in email_list):
                     for i in email_list:
                         if(i == self.email):
                             index = email_list.index(i)
 
-                    pwd_list = [d['student_password'] for d in student_list]
+                    pwd_list = [d['password'] for d in student_list]
                     pwd = pwd_list[index]
 
                     if(pwd == self.password):

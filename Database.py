@@ -35,8 +35,18 @@ class Database:
         }
 
     # TODO - Should check if there's already a student with the same StudentId or Email and if there is return false, dont forget to add self._save_changes_to_data_file()
-    def register_student(self, student: Student) -> bool:
-        return False
+    def register_student(self, student: Student):
+        self.data['students'].append(student.model_dump())
+        self._save_changes_to_data_file()
+    
+    # To fetch all the data from data_file.json
+    def get_data(self):
+        try:
+            with open("data_file.json", 'r') as s:                      
+                self.studentList = json.loads(s.read())
+                return self.studentList
+        except json.decoder.JSONDecodeError:
+            pass
 
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
     def create_subject(self, subject):
