@@ -15,7 +15,7 @@ class AdminSubSystem(SubSystem):
         self.print_line("Welcome to Admin SubSystem")
         while True:
             option = input(
-                "(1) View all Students, (2) Remove Student, (3) View all Subjects, (4) Create Subject, (5) View by Grade, (6) Clear Student Database, (99) ExitSubSystem: ")
+                "(1) View all Students, (2) Remove Student, (3) View all Subjects, (4) Create Subject, (5) View by Grade, (6) Partition Students, (7) Clear Student Database, (99) ExitSubSystem: ")
             if option == "1":
                 self.view_all_student_prompt()
             elif option == "2":
@@ -27,6 +27,8 @@ class AdminSubSystem(SubSystem):
             elif option == "5":
                 self.view_by_grade_prompt()
             elif option == "6":
+                self.partition_students()
+            elif option == "7":
                 self.clear_database_prompt()
             elif option == "99":
                 self.print_line("Exiting SubSystem")
@@ -100,6 +102,9 @@ class AdminSubSystem(SubSystem):
     def view_by_grade_prompt(self):
         self.print_line("UserStory-402, Organize and view students by grade")
         self.print_line("UserStory-403, Categorize students as PASS or FAIL based on marks")
+    
+    def partition_students(self):
+        self.print_line("PASS or FAIL")
 
     # TODO UserStory-405, Clear the entire students.data file from the system
     def clear_database_prompt(self):
