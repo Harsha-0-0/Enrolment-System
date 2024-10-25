@@ -9,7 +9,6 @@ from Student.Student import Student
 from Subject.Subject import Subject
 import numpy as np
 
-
 class Database:
     def __init__(self, db_file_name):
         self.db_file_name = db_file_name
@@ -29,6 +28,10 @@ class Database:
         with open(self.db_file_name, 'w') as json_file:
             json.dump(self.data, json_file, indent=4)  # Write the default data to the file
 
+    def _save_changes_to_data_file(self):
+        with open(self.db_file_name, 'w') as json_file:
+            json.dump(self.data, json_file, indent=4)        
+
     def _initialise_data_file(self):
         return {
             "students": [],
@@ -39,27 +42,90 @@ class Database:
     def register_student(self, student: Student):
         self.data['students'].append(student.model_dump())
         self._save_changes_to_data_file()
-
+    
     # To fetch all the data from data_file.json
     def get_data(self):
         try:
-            with open("data_file.json", 'r') as s:
+            with open("data_file.json", 'r') as s:                      
                 self.studentList = json.loads(s.read())
                 return self.studentList
         except json.decoder.JSONDecodeError:
             pass
 
+    # TODO - Just match on Email/Password or return null
+    def login_student(self, email: str, password: str) -> Student:
+        return None
+
+
+   # Returns false if no match, don't forget to add self._save_changes_to_data_file()
+    def change_student_pw(self, student_id: str, new_password: str) -> bool:
+        student = next((s for s in self.data['students'] if s['student_id'] == student_id), None)
+
+        if student:
+            student['password'] = new_password
+            self._save_changes_to_data_file()
+            return True  
+        else:
+            return False  
+
+
+
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
     def create_subject(self, subject):
-        self.data['subjects'].append(subject.model_dump())  # serialization
+        self.data['subjects'].append(subject.model_dump()) # serialization
         self._save_changes_to_data_file()
 
-    # TODO - Find student, find subject, check if the student is already enrolled or not, use _limit_enrolment(), create enrolment, dont forget to add self._save_changes_to_data_file()
-    def enrol_student(self, student_id: str, subject_id: int) -> bool:
-        return False
 
+    # Limit Enrolment
     def _limit_enrolment(self, current_enrolment_count: int) -> bool:
-        return False
+        return current_enrolment_count >= 4
+
+    # Enrol - Find student, find subject, check if the student is already enrolled or not, use _limit_enrolment(), create enrolment, dont forget to add self._save_changes_to_data_file()
+    def enrol_student(self, student_id: str, subject_id: int) -> bool:
+        student = next((s for s in self.data['students'] if s['student_id'] == student_id), None)
+        if not student:
+            return False  
+
+        if 'enrolments' not in student or student['enrolments'] is None:
+            student['enrolments'] = []
+
+        enrolled_subjects = student['enrolments']
+
+        if subject_id in enrolled_subjects:
+            return False  
+
+        if len(enrolled_subjects) >= 4:
+            return False  
+
+        available_subjects = [sub['subject_id'] for sub in self.data['subjects'] if sub['subject_id'] not in enrolled_subjects]
+
+        if subject_id not in available_subjects:
+            return False  
+
+        student['enrolments'].append(subject_id)
+        self._save_changes_to_data_file()
+        return True
+    
+
+    # Withdraw - Find student, find enrolment with the with subject_id, don't forget to add self._save_changes_to_data_file()
+    def unenrol_student(self, student_id: str, subject_id: int) -> bool:
+        student = next((s for s in self.data['students'] if s['student_id'] == student_id), None)
+        if not student:
+            return False  
+
+        if 'enrolments' not in student or student['enrolments'] is None:
+            return False  
+
+        enrolled_subjects = student['enrolments']
+
+        if subject_id not in enrolled_subjects:
+            return False  
+
+        enrolled_subjects.remove(subject_id)
+        self._save_changes_to_data_file()
+        return True
+
+
 
     # TODO - Just make sure it doesn't have duplicates, can be any int, it is possible this field is unnessary
     def generate_enrolment_id(self) -> int:
@@ -67,20 +133,20 @@ class Database:
 
     # TODO - Should get all existing student_ids, maybe convert to int and find the highest number and then pad the leading zero and then ensure there is no duplicate and return
     def generate_student_id(self) -> str:
-
+        
         existing_ids = {student['student_id'] for student in self.data['students']}
-        least_available_id = 1  # id start from zero or one ??
+        least_available_id = 1 # id start from zero or one ??
         for least_available_id in existing_ids:
             existing_ids += 1
         return least_available_id
-
+    
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
     def create_subject_id(self) -> int:
         # new_subject_id = -1
         # Extract IDs from dictionaries
         existing_ids = {subject['subject_id'] for subject in self.data['subjects']}
-        # return the least availble id
-        least_available_id = 1
+        # return the least availble id 
+        least_available_id = 1 
         for least_available_id in existing_ids:
             existing_ids += 1
         return least_available_id
@@ -89,21 +155,18 @@ class Database:
         # while True:
         #     # Generate a random number between 1 and 999 #
         #     # randint is inclusive on both ends
-
+            
         #     new_subject_id = random.randint(1, 999)
-
+        
         #     # Check if the ID is unique
         #     if new_subject_id not in existing_ids:
         #         break  # Unique ID found, exit loop
-
+        
         # return new_subject_id
-
+    
     # TODO - Maybe return sorted by student_id
     def view_student_list(self) -> List[Student]:
-        # Convert the list of dictionaries into a list of Subject instances
-        students = [Student(**student) for student in self.data['students']]
-        # Sort the subjects by subject_id
-        return sorted(students, key=lambda student: student.student_id)
+        return None
 
     def view_by_grade(self) -> List[Student]:
         return None
@@ -118,31 +181,20 @@ class Database:
         # Sort the subjects by subject_id
         return sorted(subjects, key=lambda subject: subject.subject_id)
 
-    # TODO - Should return a list of enroled subjects for the student
-    def view_enrolled_subjects(self, student_id: int) -> List[Enrolment]:
-        return None
 
     # TODO - Could be used just to return the particular subject's name
     def get_subject(self, subject_id: int) -> Subject:
         return None
 
-    # TODO - Just match on Email/Password or return null
-    def login_student(self, email: str, password: str) -> Student:
-        return None
 
     # TODO - Returns false if no match, don't forget to add self._save_changes_to_data_file()
     def remove_student(self, student_id: str) -> bool:
         return False
 
-    # TODO - Returns false if no match, don't forget to add self._save_changes_to_data_file()
-    def change_student_pw(self, student_id: str, new_password: str) -> bool:
-        return False
 
-    # TODO - Find student, find enrolment with the with subject_id, don't forget to add self._save_changes_to_data_file()
-    def unenrol_student(self, student_id: str, subject_id: int) -> bool:
-        return False
 
-    # Save the data back to the file
-    def _save_changes_to_data_file(self):
-        with open(self.db_file_name, 'w') as json_file:
-            json.dump(self.data, json_file, indent=4)
+ 
+
+
+
+

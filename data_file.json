@@ -6,7 +6,12 @@
             "password": "Hello@123",
             "email": "h.v@university.com",
             "registered_date": "2024-10-25",
-            "enrolments": null
+            "enrolments": [
+                "567",
+                "103",
+                "001",
+                "123"
+            ]
         },
         {
             "student_id": "640263",
@@ -15,11 +20,24 @@
             "email": "boo.yaa@university.com",
             "registered_date": "2024-10-25",
             "enrolments": null
+        },
+        {
+            "student_id": "560350",
+            "name": "Dahye",
+            "password": "Hello@123",
+            "email": "dh.k@university.com",
+            "registered_date": "2024-10-25",
+            "enrolments": [
+                "123",
+                "103",
+                "567",
+                "001"
+            ]
         }
     ],
     "subjects": [
         {
-            "subject_id": "148",
+            "subject_id": "123",
             "subject_name": "English"
         },
         {
