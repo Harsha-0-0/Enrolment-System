@@ -12,6 +12,10 @@
         {
             "subject_id": 567,
             "subject_name": "Software Development"
+        },
+        {
+            "subject_id": "001",
+            "subject_name": "Science"
         }
     ]
 }

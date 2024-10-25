@@ -87,13 +87,13 @@ class AdminSubSystem(SubSystem):
         self.print_line(tabulate(subject_list, headers=headers, tablefmt="pretty"))
 
     def create_subject_prompt(self):
-        subject_id = self.database.create_subject_id()
-        sub = Subject(subject_id=subject_id)
+        sub = Subject()
         subject_name = input("Enter Subject Name: ")
-        if sub.set_subject_name(subject_name):
-            self.database.create_subject(sub)
-        else:
+        while not sub.set_subject_name(subject_name):
             self.print_error("Invalid, please try again")
+            subject_name = input("Enter Subject Name: ")
+        sub._gen_subid(self.database.data['subjects'])
+        self.database.create_subject(sub)
 
     # TODO UserStory-402, Organize and view students by grade
     # TODO UserStory-403, Categorize students as PASS or FAIL based on marks
