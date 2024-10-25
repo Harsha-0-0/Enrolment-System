@@ -7,7 +7,7 @@ from StudentSubSystem import StudentSubSystem
 if __name__ == "__main__":
     while True:
         database = Database("data_file.json")
-        option = input(Style.RESET_ALL + "Enter 's' for student or 'a' for or 'e' for exit: ")
+        option = input(Style.RESET_ALL + "Enter 's' for Student or 'a' for Admin or 'e' for Exit: ")
         if option == "s":
             student_console = StudentSubSystem(database)
             student_console.launch()
