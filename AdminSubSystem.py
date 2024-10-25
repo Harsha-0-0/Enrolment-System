@@ -1,7 +1,7 @@
 import json
 from colorama import Fore
 import pandas as pd
-from tabulate import tabulate 
+from tabulate import tabulate
 from Database import Database
 from SubSystem import SubSystem
 from Subject.Subject import Subject
@@ -37,45 +37,37 @@ class AdminSubSystem(SubSystem):
     # TODO UserStory-401 @Harsha, View list of all registered students
     def view_all_student_prompt(self):
         try:
-            with open("data_file.json", 'r') as s:                      
+            with open("data_file.json", 'r') as s:
                 self.studentList = json.loads(s.read())
         except json.decoder.JSONDecodeError:
             pass
         student_list = self.studentList['students']
-        # TO show only selected columns, used Pandas, Dataframe 
+        # TO show only selected columns, used Pandas, Dataframe
         cols = ['student_id', 'name', 'email']
-        df = pd.DataFrame(data=student_list, columns=cols)        
-        self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
+        df = pd.DataFrame(data=student_list, columns=cols)
+        self.print_line(tabulate(df, tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
 
     # TODO UserStory-404, Remove individual students from the system
     def remove_student_prompt(self):
 
         try:
-            with open("data_file.json", 'r') as s:                      
+            with open("data_file.json", 'r') as s:
                 self.studentList = json.loads(s.read())
         except json.decoder.JSONDecodeError:
             pass
-        student_list = self.studentList['students']
-        cols = ['student_id', 'name', 'email']
-        df = pd.DataFrame(data=student_list, columns=cols)
-        self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
         student_id = input('Enter the ID of student you want to delete: ')
         id_list = [d['student_id'] for d in student_list]
-        if(student_id in id_list):
+        if (student_id in id_list):
             index = id_list.index(student_id)
             self.studentList['students'].pop(index)
-            try:                
+            try:
                 with open("data_file.json", 'w') as w:
-                    json.dump(self.studentList, w, indent=4)   
-                    self.print_line("Deleted successfully!")                                 
+                    json.dump(self.studentList, w, indent=4)
+                    self.print_line("Deleted successfully!")
             except json.decoder.JSONDecodeError:
                 pass
-            
-            student_list_after_update = self.studentList['students']
-            df = pd.DataFrame(data=student_list_after_update, columns=cols)
-            self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
-        else:
-            self.print_error(f"Student ID {student_id} does not exist.")
+
+            self.print_line(tabulate(student_list, tablefmt="github", headers="keys"))
 
     def view_all_subjects_prompt(self):
         subjects = self.database.get_all_subjects()
