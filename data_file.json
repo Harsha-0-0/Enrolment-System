@@ -1,5 +1,22 @@
 {
-    "students": [],
+    "students": [
+        {
+            "student_id": "676668",
+            "name": "Harsha",
+            "password": "Hello@123",
+            "email": "h.v@university.com",
+            "registered_date": "2024-10-25",
+            "enrolments": null
+        },
+        {
+            "student_id": "640263",
+            "name": "Boo",
+            "password": "Booyaa@123",
+            "email": "boo.yaa@university.com",
+            "registered_date": "2024-10-25",
+            "enrolments": null
+        }
+    ],
     "subjects": [
         {
             "subject_id": "148",
