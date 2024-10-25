@@ -43,7 +43,7 @@ class AdminSubSystem(SubSystem):
             pass
         student_list = self.studentList['students']
         # TO show only selected columns, used Pandas, Dataframe
-        cols = ['student_id', 'student_name', 'student_mail']
+        cols = ['student_id', 'name', 'email']
         df = pd.DataFrame(data=student_list, columns=cols)
         self.print_line(tabulate(df, tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
 
