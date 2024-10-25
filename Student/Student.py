@@ -44,8 +44,7 @@ class Student(BaseModel):
         while True:
             ids = [d['student_id'] for d in student_list]
             uid = str(random.randint(100000, 999999))
-            
-            if uid not in ids:  
+
+            if uid not in ids:
                 self.student_id = uid
                 return self.student_id
-    

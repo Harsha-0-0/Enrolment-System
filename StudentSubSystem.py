@@ -33,13 +33,13 @@ class StudentSubSystem(SubSystem):
             student = Student()
             self.print_line('Please enter email and password to register')
             self.email = input("Enter email: ")
-            self.password = input("Enter Password: ") 
+            self.password = input("Enter Password: ")
             self.name = input("Enter Name: ")
-            
-            #verifying the mail and password
+
+            # verifying the mail and password
             valid_mail = student.verify_student_email(self.email)
             valid_pwd = student.verify_student_password(self.password)
-                
+
             if valid_mail and valid_pwd:
                 break
             elif not valid_mail and not valid_pwd:
@@ -49,48 +49,48 @@ class StudentSubSystem(SubSystem):
             elif not valid_pwd:
                 self.print_error('The password is not valid. Please try again.')
 
-        #setting values to student
+        # setting values to student
         student.email = self.email
         student.password = self.password
         student.name = self.name
-        
-        #Getting data from data_file.json
+
+        # Getting data from data_file.json
         self.data = self.database.get_data()
 
-        #Check if student exists. If it is a new email, create generate student id and add to the data_file.json file
+        # Check if student exists. If it is a new email, create generate student id and add to the data_file.json file
         student_list = self.data['students']
         email_list = [d['email'] for d in student_list]
 
         if self.email in email_list:
-            self.print_error('Email ID already exists. Please log in or Register with new Email ID')            
-        else:   
+            self.print_error('Email ID already exists. Please log in or Register with new Email ID')
+        else:
             student.student_id = student.generate_student_id(student_list)
             student.registered_date = datetime.now().strftime('%Y-%m-%d')
             self.database.register_student(student)
-            self.print_line("Registered successfully!") 
-            
+            self.print_line("Registered successfully!")
 
     # TODO UserStory-105, Log in with registered email and password
     # TODO UserStory-106, Display specific error messages for incorrect login details
+
     def login_student_prompt(self):
         while True:
             self.print_line('Please enter email and password to login.')
             self.email = input("Enter email: ")
-            self.password = input("Enter Password: ") 
+            self.password = input("Enter Password: ")
             if self.email and self.password != '':
-                 #Reading data from data_file.json
+                # Reading data from data_file.json
                 self.data = self.database.get_data()
                 student_list = self.data['students']
                 email_list = [d['email'] for d in student_list]
-                if(self.email in email_list):
+                if (self.email in email_list):
                     for i in email_list:
-                        if(i == self.email):
+                        if (i == self.email):
                             index = email_list.index(i)
 
                     pwd_list = [d['password'] for d in student_list]
                     pwd = pwd_list[index]
 
-                    if(pwd == self.password):
+                    if (pwd == self.password):
                         self.print_line('Login Successful')
                         break
                     else:
@@ -169,9 +169,3 @@ class RegisteredStudents:
                 json.dump(self.studentList, s, indent=4)
         except json.decoder.JSONDecodeError:
             pass
-
-
-if __name__ == "__main__":
-    stu = Student()
-    stu.set_name("lol")
-    print(stu.name)
