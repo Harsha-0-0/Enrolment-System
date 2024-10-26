@@ -9,6 +9,7 @@ from datetime import datetime
 class StudentSubSystem(SubSystem):
     def __init__(self, database):
         super().__init__(database, Fore.YELLOW)
+        self.logged_in_student = None 
 
     def launch(self):
         self.print_line("Welcome to Student SubSystem")
@@ -93,31 +94,24 @@ class StudentSubSystem(SubSystem):
             self.print_line('Please enter email and password to login.')
             self.email = input("Enter email: ")
             self.password = input("Enter Password: ") 
+            
             if self.email and self.password != '':
-                 #Reading data from data_file.json
                 self.data = self.database.get_data()
                 student_list = self.data['students']
-                email_list = [d['email'] for d in student_list]
-                if(self.email in email_list):
-                    for i in email_list:
-                        if(i == self.email):
-                            index = email_list.index(i)
 
-                    pwd_list = [d['password'] for d in student_list]
-                    pwd = pwd_list[index]
+                self.logged_in_student = next((student for student in student_list if student['email'] == self.email), None)
 
-                    if(pwd == self.password):
-                        self.print_line('Login Successful')
-                        break
-                    else:
-                        self.print_error('Password incorrect. Try Again.')
+                if self.logged_in_student and self.logged_in_student['password'] == self.password:
+                    self.print_line('Login Successful')
+                    break
                 else:
-                    self.print_error('User does not exist. Please log in with correct credentials.')
+                    self.print_error('Invalid email or password. Try Again.')
             else:
                 self.print_error('Please enter valid values for logging in.')
+
         while True:
             option = input(
-                "(1) View My Enrolments, (2) Enrol in Subject, (3) Withdraw from Subject, (4) Change Password, (99) ExitSubSystem: ")
+                "(1) View My Enrolments, (2) Enrol in Subject, (3) Withdraw from Subject, (4) Change Password, (99) Exit SubSystem: ")
             if option == "1":
                 self.view_my_enrolments_prompt()
             elif option == "2":
@@ -132,34 +126,25 @@ class StudentSubSystem(SubSystem):
             else:
                 self.print_error("Invalid option")
 
-    # TODO UserStory-301, View list of enrolled subjects
+
+    # UserStory-301, View list of enrolled subjects
+    def view_my_enrolments_prompt(self):
+        self.print_line("You are currently enrolled in the following subjects:")
+        self.view_enrolled_subjects()
+
     def view_enrolled_subjects(self):
         self.print_line("Viewing enrolled subjects.")
+        enrolled_subjects = self.logged_in_student.get('enrolments', [])
 
-        student_id = input("Enter your student ID: ")
-        
-        student_data = self.database.get_data()  
-        student = next((s for s in student_data['students'] if s['student_id'] == student_id), None)
-        
-        if not student:
-            self.print_error("Student not found.")
-            return
-
-        enrolled_subjects = student.get('enrolments', [])
-        
         if not enrolled_subjects:
             self.print_line("No subjects enrolled.")
             return
 
-        self.print_line("Enrolled Subjects:")
-        for subject_id in enrolled_subjects:
-            subject = next((sub for sub in self.database.get_data()['subjects'] if sub['subject_id'] == subject_id), None)
-            if subject:
-                self.print_line(f"- {subject['subject_name']} (ID: {subject_id})")
-
-    def view_my_enrolments_prompt(self):
-        self.print_line("Viewing your enrolled subjects.")
-        self.view_enrolled_subjects()
+        self.print_line("You are currently enrolled in the following subjects:")
+        for subject in enrolled_subjects:
+            subject_info = next((sub for sub in self.database.get_data()['subjects'] if sub['subject_id'] == subject['subject_id']), None)
+            if subject_info:
+                self.print_line(f"- {subject_info['subject_name']} (ID: {subject['subject_id']}, Mark: {subject['mark']}, Grade: {subject['grade']})")
 
 
 
@@ -169,19 +154,15 @@ class StudentSubSystem(SubSystem):
     def enrol_in_subject_prompt(self):
         self.print_line("Automatically Enrol in subjects is in progress.")
 
-        student_id = input("Enter your student ID: ")
-
-        student_data = self.database.get_data()  
-        student = next((s for s in student_data['students'] if s['student_id'] == student_id), None)
-
-        if not student:
-            self.print_error("Student not found.")
+        if not self.logged_in_student:  
+            self.print_error("You must be logged in to enrol in subjects.")
             return
+        
+        enrolled_subjects = self.logged_in_student.get('enrolments', [])
 
-        if 'enrolments' not in student or student['enrolments'] is None:
-            student['enrolments'] = []
-
-        enrolled_subjects = student['enrolments']
+        if len(enrolled_subjects) >= 4:
+            self.print_error("Enrolment for more than 4 subjects is not allowed.")
+            return
 
         available_subjects = [sub['subject_id'] for sub in self.database.get_data()['subjects'] if sub['subject_id'] not in enrolled_subjects]
 
@@ -192,51 +173,53 @@ class StudentSubSystem(SubSystem):
         subjects_to_enrol = random.sample(available_subjects, min(4 - len(enrolled_subjects), len(available_subjects)))
 
         for subject_id in subjects_to_enrol:
-            self.database.enrol_student(student_id, subject_id)
+            self.database.enrol_student(self.logged_in_student['student_id'], subject_id)
 
         self.database._save_changes_to_data_file()
         self.print_line("Successfully enrolled in subjects automatically!")
 
 
 
-
     # UserStory-302, Remove a subject from enrolment list
-
     def withdraw_from_subject_prompt(self):
+        if not self.logged_in_student:
+            self.print_error("You must be logged in to withdraw from subjects.")
+            return
+
         self.print_line("Withdrawing a subject from enrolment list.")
-
-        student_id = input("Enter your student ID: ")
         subject_id = input("Enter the subject ID you want to withdraw from: ")
-
-        if self.database.unenrol_student(student_id, subject_id):
+        
+        if self.database.unenrol_student(self.logged_in_student['student_id'], subject_id):
             self.print_line("Successfully withdrawn from the subject.")
         else:
-            self.print_error("Failed to withdraw. Please check your student ID or subject ID.")
+            self.print_error("Failed to withdraw. Please check your subject ID.")
+
 
 
     # UserStory-205, Change the password
     def change_password_prompt(self):
         self.print_line("Change the password")
 
-        current_email = input("Enter your email: ")
+        if not self.logged_in_student:  
+            self.print_error("You must be logged in to change your password.")
+            return
+        
         current_password = input("Enter your current password: ")
 
-        student_data = self.database.get_data()  
-        user = next((student for student in student_data['students'] if student['email'] == current_email), None)
-
-        if user and user['password'] == current_password:
+        if self.logged_in_student['password'] == current_password:
             new_password = input("Enter new password: ")
             
             if self.verify_student_password(new_password):
-                if self.database.change_student_pw(user['student_id'], new_password):
-                    self.database._save_changes_to_data_file()  # 변경 사항 저장
+                if self.database.change_student_pw(self.logged_in_student['student_id'], new_password):
+                    self.database._save_changes_to_data_file() 
                     self.print_line("Password changed successfully!")
                 else:
                     self.print_error("Failed to change password.")
             else:
                 self.print_error("New password does not meet the criteria.")
         else:
-            self.print_error("Invalid email or password.")
+            self.print_error("Invalid current password.")
+
 
 
     

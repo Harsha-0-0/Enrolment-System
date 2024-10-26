@@ -69,12 +69,14 @@ class Database:
             return False  
 
 
-
     # This method is done @Niki, I had to play around with the pydantic python library for saving in memory stuff to the file, from @April
     def create_subject(self, subject):
         self.data['subjects'].append(subject.model_dump()) # serialization
         self._save_changes_to_data_file()
 
+    # Return Logged in information with student ID
+    def get_student_by_id(self, student_id: str):
+        return next((s for s in self.data['students'] if s['student_id'] == student_id), None)
 
     # Limit Enrolment
     def _limit_enrolment(self, current_enrolment_count: int) -> bool:
@@ -94,7 +96,8 @@ class Database:
         if subject_id in enrolled_subjects:
             return False  
 
-        if len(enrolled_subjects) >= 4:
+        if self._limit_enrolment(len(enrolled_subjects)):
+            print("Enrolment for more than 4 subjects is not allowed.")
             return False  
 
         available_subjects = [sub['subject_id'] for sub in self.data['subjects'] if sub['subject_id'] not in enrolled_subjects]
@@ -102,9 +105,32 @@ class Database:
         if subject_id not in available_subjects:
             return False  
 
-        student['enrolments'].append(subject_id)
+        random_mark = random.randint(25, 100)
+        grade = self._calculate_grade(random_mark)
+
+        student['enrolments'].append({
+            'subject_id': subject_id,
+            'mark': random_mark,
+            'grade': grade
+        })
+
         self._save_changes_to_data_file()
         return True
+
+
+
+    def _calculate_grade(self, mark):
+        if mark < 50:
+            return 'Z'
+        elif 50 <= mark < 65:
+            return 'P'
+        elif 65 <= mark < 75:
+            return 'C'
+        elif 75 <= mark < 85:
+            return 'D'
+        else:
+            return 'HD'
+
     
 
     # Withdraw - Find student, find enrolment with the with subject_id, don't forget to add self._save_changes_to_data_file()
@@ -117,14 +143,13 @@ class Database:
             return False  
 
         enrolled_subjects = student['enrolments']
+        for subject in enrolled_subjects:
+            if subject['subject_id'] == subject_id:
+                enrolled_subjects.remove(subject)  
+                self._save_changes_to_data_file() 
+                return True  
 
-        if subject_id not in enrolled_subjects:
-            return False  
-
-        enrolled_subjects.remove(subject_id)
-        self._save_changes_to_data_file()
-        return True
-
+        return False  
 
 
     # TODO - Just make sure it doesn't have duplicates, can be any int, it is possible this field is unnessary
@@ -191,9 +216,6 @@ class Database:
     def remove_student(self, student_id: str) -> bool:
         return False
 
-
-
- 
 
 
 

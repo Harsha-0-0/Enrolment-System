@@ -6,12 +6,7 @@
             "password": "Hello@123",
             "email": "h.v@university.com",
             "registered_date": "2024-10-25",
-            "enrolments": [
-                "567",
-                "103",
-                "001",
-                "123"
-            ]
+            "enrolments": null
         },
         {
             "student_id": "640263",
@@ -28,10 +23,26 @@
             "email": "dh.k@university.com",
             "registered_date": "2024-10-25",
             "enrolments": [
-                "123",
-                "103",
-                "567",
-                "001"
+                {
+                    "subject_id": "567",
+                    "mark": 33,
+                    "grade": "Z"
+                },
+                {
+                    "subject_id": "103",
+                    "mark": 75,
+                    "grade": "D"
+                },
+                {
+                    "subject_id": "123",
+                    "mark": 75,
+                    "grade": "D"
+                },
+                {
+                    "subject_id": "001",
+                    "mark": 30,
+                    "grade": "Z"
+                }
             ]
         }
     ],
