@@ -107,7 +107,22 @@ class AdminSubSystem(SubSystem):
     def view_by_grade_prompt(self):
         self.print_line("UserStory-402, Organize and view students by grade")
         self.print_line("UserStory-403, Categorize students as PASS or FAIL based on marks")
+        try:
+            with open("data_file.json", 'r') as s:                      
+                self.meta_data = json.loads(s.read())
+        except json.decoder.JSONDecodeError:
+            pass
+        student_list = self.meta_data['students']
+        enrolment_list = self.meta_data['enrolments']
 
+        stu_df = pd.DataFrame(data=student_list, columns=['student_id', 'name'])
+        enrol_df = pd.DataFrame(data=enrolment_list, columns=['student_id', 'subject_id', 'grade', 'mark'])
+        merge_df = pd.merge(stu_df, enrol_df, on='student_id',how='right')
+        # self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
+
+        for gradegroup in merge_df.groupby('grade'):
+            print(gradegroup[0])
+            self.print_line(tabulate(gradegroup[1], headers=['name', 'student_id', 'subject_id', 'grade', 'mark'], tablefmt="pretty"))
     # TODO UserStory-405, Clear the entire students.data file from the system
     def clear_database_prompt(self):
         self.database.clear_student_file()
