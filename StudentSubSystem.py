@@ -1,6 +1,8 @@
 import json
 import random
 from colorama import Fore
+import pandas as pd
+from tabulate import tabulate
 from SubSystem import SubSystem
 from Student.Student import Student
 from datetime import datetime
@@ -9,7 +11,6 @@ from datetime import datetime
 class StudentSubSystem(SubSystem):
     def __init__(self, database):
         super().__init__(database, Fore.YELLOW)
-        self.logged_in_student = None 
 
     def launch(self):
         self.print_line("Welcome to Student SubSystem")
@@ -55,7 +56,7 @@ class StudentSubSystem(SubSystem):
             
             #verifying the mail and password
             valid_mail = student.verify_student_email(self.email)
-            valid_pwd = student.verify_student_password(self.password)
+            valid_pwd = self.verify_student_password(self.password)
                 
             if valid_mail and valid_pwd:
                 break
@@ -71,11 +72,9 @@ class StudentSubSystem(SubSystem):
         student.password = self.password
         student.name = self.name
         
-        #Getting data from data_file.json
-        self.data = self.database.get_data()
 
         #Check if student exists. If it is a new email, create generate student id and add to the data_file.json file
-        student_list = self.data['students']
+        student_list = self.database.get_student_list()
         email_list = [d['email'] for d in student_list]
 
         if self.email in email_list:
@@ -96,19 +95,23 @@ class StudentSubSystem(SubSystem):
             self.password = input("Enter Password: ") 
             
             if self.email and self.password != '':
-                self.data = self.database.get_data()
-                student_list = self.data['students']
-
-                self.logged_in_student = next((student for student in student_list if student['email'] == self.email), None)
-
-                if self.logged_in_student and self.logged_in_student['password'] == self.password:
-                    self.print_line('Login Successful')
-                    break
+                student_list = self.database.get_student_list()
+                email_list = [d['email'] for d in student_list]
+                if(self.email in email_list):
+                    for i in email_list:
+                        if(i == self.email):
+                            self.index = email_list.index(i)
+                    pwd_list = [d['password'] for d in student_list]
+                    pwd = pwd_list[self.index]
+                    if(pwd == self.password):
+                        self.print_line('Login Successful')
+                        break
+                    else:
+                        self.print_error('Password incorrect. Try Again.')
                 else:
-                    self.print_error('Invalid email or password. Try Again.')
+                    self.print_error('User does not exist. Please log in with correct credentials.')
             else:
                 self.print_error('Please enter valid values for logging in.')
-
         while True:
             option = input(
                 "(1) View My Enrolments, (2) Enrol in Subject, (3) Withdraw from Subject, (4) Change Password, (99) Exit SubSystem: ")
@@ -134,37 +137,44 @@ class StudentSubSystem(SubSystem):
 
     def view_enrolled_subjects(self):
         self.print_line("Viewing enrolled subjects.")
-        enrolled_subjects = self.logged_in_student.get('enrolments', [])
+        
+        #student has current student data
+        student = self.database.get_student(self.index)
+        enrolled_subjects = student.get('enrolments',[])
 
         if not enrolled_subjects:
             self.print_line("No subjects enrolled.")
             return
 
         self.print_line("You are currently enrolled in the following subjects:")
-        for subject in enrolled_subjects:
-            subject_info = next((sub for sub in self.database.get_data()['subjects'] if sub['subject_id'] == subject['subject_id']), None)
-            if subject_info:
-                self.print_line(f"- {subject_info['subject_name']} (ID: {subject['subject_id']}, Mark: {subject['mark']}, Grade: {subject['grade']})")
-
+        cols = ['subject_id', 'subject_name']
+        df = pd.DataFrame(data=enrolled_subjects, columns=cols)        
+        self.print_line(tabulate(df , tablefmt="github", headers=["Subject ID", "Subject Name"]))
 
 
     # UserStory-201, Automatically Enrol in subjects
-    import random
 
     def enrol_in_subject_prompt(self):
         self.print_line("Automatically Enrol in subjects is in progress.")
 
-        if not self.logged_in_student:  
-            self.print_error("You must be logged in to enrol in subjects.")
-            return
         
-        enrolled_subjects = self.logged_in_student.get('enrolments', [])
+        #student has current student data
+        student = self.database.get_student(self.index)
+         
+        enrolled_subjects = []
+        subject_id_list = []
+        if student.get('enrolments',[]):
+            enrolled_subjects.__iadd__(student.get('enrolments',[]))
+            
+            subject_id_list = [d['subject_id'] for d in enrolled_subjects]
+              
+        if enrolled_subjects:
+            if self.database.countList(enrolled_subjects) >= 4:
+                self.print_error("You are already enroled in 4 subjects. Enrolment for more than 4 subjects is not allowed.")
+                return
+        
 
-        if len(enrolled_subjects) >= 4:
-            self.print_error("Enrolment for more than 4 subjects is not allowed.")
-            return
-
-        available_subjects = [sub['subject_id'] for sub in self.database.get_data()['subjects'] if sub['subject_id'] not in enrolled_subjects]
+        available_subjects = [sub['subject_id'] for sub in self.database.get_data()['subjects'] if sub['subject_id'] not in subject_id_list]
 
         if not available_subjects:
             self.print_error("No available subjects to enrol in.")
@@ -172,24 +182,23 @@ class StudentSubSystem(SubSystem):
 
         subjects_to_enrol = random.sample(available_subjects, min(4 - len(enrolled_subjects), len(available_subjects)))
 
-        for subject_id in subjects_to_enrol:
-            self.database.enrol_student(self.logged_in_student['student_id'], subject_id)
-
-        self.database._save_changes_to_data_file()
-        self.print_line("Successfully enrolled in subjects automatically!")
+        if subjects_to_enrol:
+            for subject_id in subjects_to_enrol:
+                self.database.enrol_student(student.get('student_id'), subject_id)
+            self.database._save_changes_to_data_file()
+            self.print_line("Successfully enrolled in subjects automatically!")
+        else:
+            self.print_error("Enrolment for more than 4 subjects is not allowed.")    
 
 
 
     # UserStory-302, Remove a subject from enrolment list
     def withdraw_from_subject_prompt(self):
-        if not self.logged_in_student:
-            self.print_error("You must be logged in to withdraw from subjects.")
-            return
-
+        student = self.database.get_student(self.index)
         self.print_line("Withdrawing a subject from enrolment list.")
         subject_id = input("Enter the subject ID you want to withdraw from: ")
         
-        if self.database.unenrol_student(self.logged_in_student['student_id'], subject_id):
+        if self.database.unenrol_student(student.get('student_id'), subject_id):
             self.print_line("Successfully withdrawn from the subject.")
         else:
             self.print_error("Failed to withdraw. Please check your subject ID.")
@@ -199,18 +208,17 @@ class StudentSubSystem(SubSystem):
     # UserStory-205, Change the password
     def change_password_prompt(self):
         self.print_line("Change the password")
-
-        if not self.logged_in_student:  
-            self.print_error("You must be logged in to change your password.")
-            return
         
         current_password = input("Enter your current password: ")
+        
+        #student has current student data
+        student = self.database.get_student(self.index)
 
-        if self.logged_in_student['password'] == current_password:
+        if student.get('password') == current_password:
             new_password = input("Enter new password: ")
             
             if self.verify_student_password(new_password):
-                if self.database.change_student_pw(self.logged_in_student['student_id'], new_password):
+                if self.database.change_student_pw(student.get('student_id'), new_password):
                     self.database._save_changes_to_data_file() 
                     self.print_line("Password changed successfully!")
                 else:
@@ -219,50 +227,3 @@ class StudentSubSystem(SubSystem):
                 self.print_error("New password does not meet the criteria.")
         else:
             self.print_error("Invalid current password.")
-
-
-
-    
-
-class Register:
-    def __init__(self):
-        self.email = input("Enter email: ")
-        self.password = input("Enter Password: ")
-        RegisteredStudents(self.email, self.password).__checkStudent__()
-
-
-class RegisteredStudents:
-
-    def __init__(self, email, password):
-        self.studentList = dict()
-
-        try:
-            with open("student_list.json", "r") as s:
-                self.studentList = json.loads(s.read())
-        except json.decoder.JSONDecodeError:
-            pass
-
-        self.email = email
-        self.password = password
-
-    def __checkStudent__(self):
-        if self.email in self.studentList:
-            print("Email ID already exists. Please log in or Register with new Email ID")
-        else:
-            self.add_student()
-
-    def add_student(self):
-        new = {self.email: self.password}
-
-        try:
-            with open("student_list.json", "w") as s:
-                self.studentList.update(new)
-                json.dump(self.studentList, s, indent=4)
-        except json.decoder.JSONDecodeError:
-            pass
-
-
-if __name__ == "__main__":
-    stu = Student()
-    stu.set_name("lol")
-    print(stu.name)
