@@ -7,8 +7,8 @@
             "email": "h.v@university.com",
             "registered_date": "2024-10-25",
             "enrolments": [
-                "567",
                 "103",
+                "002",
                 "001",
                 "123"
             ]
@@ -19,7 +19,7 @@
             "password": "Booyaa@123",
             "email": "boo.yaa@university.com",
             "registered_date": "2024-10-25",
-            "enrolments": null
+            "enrolments": []
         },
         {
             "student_id": "560350",
@@ -28,10 +28,10 @@
             "email": "dh.k@university.com",
             "registered_date": "2024-10-25",
             "enrolments": [
-                "123",
-                "103",
+                "001",
+                "002",
                 "567",
-                "001"
+                "103"
             ]
         }
     ],
@@ -51,6 +51,68 @@
         {
             "subject_id": "001",
             "subject_name": "Science"
+        },
+        {
+            "subject_id": "002",
+            "subject_name": "ad"
+        }
+    ],
+    "enrolments": [
+        {
+            "entrolment_date": "2024-10-27",
+            "mark": 63,
+            "grade": "P",
+            "subject_id": "001",
+            "student_id": "560350"
+        },
+        {
+            "entrolment_date": "2024-10-27",
+            "mark": 97,
+            "grade": "HD",
+            "subject_id": "002",
+            "student_id": "560350"
+        },
+        {
+            "entrolment_date": "2024-10-27",
+            "mark": 90,
+            "grade": "HD",
+            "subject_id": "567",
+            "student_id": "560350"
+        },
+        {
+            "entrolment_date": "2024-10-27",
+            "mark": 50,
+            "grade": "P",
+            "subject_id": "103",
+            "student_id": "560350"
+        },
+        {
+            "entrolment_date": "2024-10-27",
+            "mark": 63,
+            "grade": "P",
+            "subject_id": "103",
+            "student_id": "676668"
+        },
+        {
+            "entrolment_date": "2024-10-27",
+            "mark": 90,
+            "grade": "HD",
+            "subject_id": "002",
+            "student_id": "676668"
+        },
+        {
+            "entrolment_date": "2024-10-27",
+            "mark": 84,
+            "grade": "D",
+            "subject_id": "001",
+            "student_id": "676668"
+        },
+        {
+            "entrolment_date": "2024-10-27",
+            "mark": 50,
+            "grade": "P",
+            "subject_id": "123",
+            "student_id": "676668"
         }
     ]
 }
