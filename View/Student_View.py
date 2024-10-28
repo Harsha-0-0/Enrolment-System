@@ -74,6 +74,14 @@ def display_error(error_msg):
     tk.Button(error_window, text="OK", command=error_window.destroy).pack(pady=10)
     error_window.grab_set()  # Makes the error window modal
 
+def display_enrolment_exception():
+    error_window = tk.Toplevel(root)
+    error_window.title("Enrolment Error")
+    error_window.geometry("600x150")
+    tk.Label(error_window, text="You are already enroled in 4 subjects. Enrolment for more than 4 subjects is not allowed.", fg="red").pack(pady=10)
+    tk.Button(error_window, text="OK", command=error_window.destroy).pack(pady=10)
+    error_window.grab_set()
+
 def on_subjects_view():
     
     def flatten_enrolemnts(stu_info):
