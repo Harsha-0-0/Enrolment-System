@@ -34,13 +34,13 @@ class StudentSubSystem(SubSystem):
 
     #Verifying Password criteria
     def verify_student_password(self, password):
-        if not password[0].isupper():
-            return False
-
+        # adjust the logical order, prevent index out of range
         letter_count = sum(char.isalpha() for char in password)
         digit_count = sum(char.isdigit() for char in password)
 
         if letter_count < 5 or digit_count < 3:
+            return False
+        if not password[0].isupper():
             return False
 
         return True
@@ -140,6 +140,7 @@ class StudentSubSystem(SubSystem):
         
         #student has current student data
         student = self.database.get_student(self.index)
+
         enrolled_subjects = student.get('enrolments',[])
 
         if not enrolled_subjects:
