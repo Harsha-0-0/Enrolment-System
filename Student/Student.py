@@ -29,13 +29,6 @@ class Student(BaseModel):
         else:
             return False
 
-    def verify_student_password(self, password):
-        # if true assign value, else return false
-        if re.match(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$', password):
-            self.password = password
-            return True
-        else:
-            return False
 
     def generate_student_id(self, student_list):
         # niki TODO
