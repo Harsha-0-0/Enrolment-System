@@ -30,7 +30,6 @@ class Database:
 
     def _save_changes_to_data_file(self):
         with open(self.db_file_name, 'w') as json_file:
-            print('save        ', self.data)
             json.dump(self.data, json_file, indent=4)        
 
     def _initialise_data_file(self):
@@ -83,7 +82,6 @@ class Database:
 
     # Enrol - Find student, find subject, check if the student is already enrolled or not, use _limit_enrolment(), create enrolment, dont forget to add self._save_changes_to_data_file()
     def enrol_student(self, student_id: str, subject_id: int) -> bool:
-
         student = next((s for s in self.data['students'] if s['student_id'] == student_id), None)
         if not student:
             return False  
@@ -103,11 +101,6 @@ class Database:
 
         if subject_id not in available_subjects:
             return False  
-        # create enrolment subject, including mark and grade
-        enrol = Enrolment()
-        enrol.student_id = student_id
-        enrol.subject_id = subject_id
-        self.data['enrolments'].append(enrol.model_dump())
 
         student['enrolments'].append(subject_id)
         self._save_changes_to_data_file()
@@ -197,4 +190,11 @@ class Database:
     # TODO - Returns false if no match, don't forget to add self._save_changes_to_data_file()
     def remove_student(self, student_id: str) -> bool:
         return False
+
+
+
+ 
+
+
+
 

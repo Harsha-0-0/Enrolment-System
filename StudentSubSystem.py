@@ -4,7 +4,7 @@ from colorama import Fore
 from SubSystem import SubSystem
 from Student.Student import Student
 from datetime import datetime
-from Enrolment.Enrolment import Enrolment
+
 
 class StudentSubSystem(SubSystem):
     def __init__(self, database):
@@ -165,14 +165,14 @@ class StudentSubSystem(SubSystem):
 
     # UserStory-201, Automatically Enrol in subjects
     import random
-    # a random mark is also assigned here, and add to the database
+
     def enrol_in_subject_prompt(self):
         self.print_line("Automatically Enrol in subjects is in progress.")
 
         student_id = input("Enter your student ID: ")
 
-        meta_data = self.database.get_data()  
-        student = next((s for s in meta_data['students'] if s['student_id'] == student_id), None)
+        student_data = self.database.get_data()  
+        student = next((s for s in student_data['students'] if s['student_id'] == student_id), None)
 
         if not student:
             self.print_error("Student not found.")
@@ -193,7 +193,7 @@ class StudentSubSystem(SubSystem):
 
         for subject_id in subjects_to_enrol:
             self.database.enrol_student(student_id, subject_id)
-            
+
         self.database._save_changes_to_data_file()
         self.print_line("Successfully enrolled in subjects automatically!")
 
