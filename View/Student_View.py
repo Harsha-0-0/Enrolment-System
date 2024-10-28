@@ -96,7 +96,7 @@ def on_subjects_view():
     enrolment_list = flatten_enrolemnts(student_list)
 
     stu_df = pd.DataFrame(data=student_list, columns=['student_id', 'name'])
-    enrol_df = pd.DataFrame(data=enrolment_list, columns=['student_id', 'subject_id', 'grade', 'mark'])
+    enrol_df = pd.DataFrame(data=enrolment_list, columns=['student_id', 'subject_name', 'subject_id', 'grade', 'mark'])
     merge_df = pd.merge(stu_df, enrol_df, on='student_id',how='right')
     merge_df = merge_df[merge_df['student_id'] == student_id_cache]
     
@@ -104,12 +104,17 @@ def on_subjects_view():
     # subjects_view_button.pack(pady=10)
     
     listbox.pack(padx=20, pady=20)
+
     for grade, group in merge_df.groupby('grade'):
-        listbox.insert(END, f"Grade: {grade}")
         for index, row in group.iterrows():
-            listbox.insert(END, f"  Student ID: {row['student_id']}, Name: {row['name']}, Mark: {row['mark']}")
-        listbox.insert(END, "")
-    
+            listbox.insert(END, f"Subject ID: {row['subject_id']}")
+            listbox.insert(END, f"Subject Name: {row['subject_name']}")
+            listbox.insert(END, f"Mark: {row['mark']}")
+            listbox.insert(END, f"Grade: {grade}")
+            listbox.insert(END, "")
+    if listbox.size() == 0:
+        listbox.insert(END, f"No subjects enrolled")
+
     back2login_button = tk.Button(frame, text="back", command=back2login)
     back2login_button.pack(pady=0)
 
