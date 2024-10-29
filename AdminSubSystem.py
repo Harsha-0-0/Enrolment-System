@@ -15,7 +15,7 @@ class AdminSubSystem(SubSystem):
         self.print_line("Welcome to Admin SubSystem")
         while True:
             option = input(
-                "(1) View all Students, (2) Remove Student, (3) View all Subjects, (4) Create Subject, (5) View by Grade, (6) Clear Student Database, (99) ExitSubSystem: ")
+                "(1) View all Students, (2) Remove Student, (3) View all Subjects, (4) Create Subject, (5) View by Grade, (6) Pass/Fail Partition, (7) Clear Student Database, (99) ExitSubSystem: ")
             if option == "1":
                 self.view_all_student_prompt()
             elif option == "2":
@@ -27,6 +27,8 @@ class AdminSubSystem(SubSystem):
             elif option == "5":
                 self.view_by_grade_prompt()
             elif option == "6":
+                self.partition_students()
+            elif option == "7":
                 self.clear_database_prompt()
             elif option == "99":
                 self.print_line("Exiting SubSystem")
@@ -93,9 +95,13 @@ class AdminSubSystem(SubSystem):
         def flatten_enrolemnts(stu_info):
             enrol_infos = []
             for stu in stu_info:
-                for enro in stu['enrolments']:
-                    enro['student_id'] = stu['student_id']
-                    enrol_infos.append(enro)
+                enrolled_subjects = []
+                if stu.get('enrolments',[]):
+                    enrolled_subjects.__iadd__(stu.get('enrolments',[]))
+                for enro in enrolled_subjects:
+                    if enro:
+                        enro['student_id'] = stu['student_id']
+                        enrol_infos.append(enro)
 
             return pd.DataFrame(enrol_infos)
     
@@ -108,9 +114,41 @@ class AdminSubSystem(SubSystem):
         
 
         for gradegroup in merge_df.groupby('grade'):
-            print(gradegroup[0])
+            print('{:-^10}'.format(gradegroup[0]))
             self.print_line(tabulate(gradegroup[1], headers=['name', 'student_id', 'subject_id', 'grade', 'mark'], tablefmt="pretty"))
- 
+    
+    def partition_students(self): 
+        def flatten_enrolemnts(stu_info):
+            enrol_infos = []
+            for stu in stu_info:
+                enrolled_subjects = []
+                if stu.get('enrolments',[]):
+                    enrolled_subjects.__iadd__(stu.get('enrolments',[]))
+                for enro in enrolled_subjects:
+                    if enro:
+                        grade = enro['grade']
+                        enro['partition'] = partition(grade)
+                        enro['student_id'] = stu['student_id']
+                        enrol_infos.append(enro)
+
+            return pd.DataFrame(enrol_infos)
+               
+        def partition(grade):
+            if grade == 'Z':
+                partition = 'FAIL'
+            else:
+                partition = 'PASS'
+            return partition
+        
+        student_list = self.database.get_student_list()
+        enrolment_list = flatten_enrolemnts(student_list)
+
+        stu_df = pd.DataFrame(data=student_list, columns=['student_id', 'name'])
+        enrol_df = pd.DataFrame(data=enrolment_list, columns=['student_id', 'subject_id', 'subject_name', 'grade', 'mark', 'partition'])
+        merge_df = pd.merge(stu_df, enrol_df, on='student_id',how='right')
+        for partition_group in merge_df.groupby('partition'):
+            print('{:-^10}'.format(partition_group[0]))
+            self.print_line(tabulate(partition_group[1], headers=['Student Id', 'Name', 'Subject Id', 'Subject Name', 'Grade', 'Mark', 'Pass/Fail'], tablefmt="pretty"))
 
     # TODO UserStory-405, Clear the entire students.data file from the system
     def clear_database_prompt(self):
