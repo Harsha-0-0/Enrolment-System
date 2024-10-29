@@ -36,12 +36,7 @@ class AdminSubSystem(SubSystem):
 
     # TODO UserStory-401 @Harsha, View list of all registered students
     def view_all_student_prompt(self):
-        try:
-            with open("data_file.json", 'r') as s:                      
-                self.studentList = json.loads(s.read())
-        except json.decoder.JSONDecodeError:
-            pass
-        student_list = self.studentList['students']
+        student_list = self.database.get_student_list()
         # TO show only selected columns, used Pandas, Dataframe 
         cols = ['student_id', 'name', 'email']
         df = pd.DataFrame(data=student_list, columns=cols)        
@@ -50,12 +45,7 @@ class AdminSubSystem(SubSystem):
     # TODO UserStory-404, Remove individual students from the system
     def remove_student_prompt(self):
 
-        try:
-            with open("data_file.json", 'r') as s:                      
-                self.studentList = json.loads(s.read())
-        except json.decoder.JSONDecodeError:
-            pass
-        student_list = self.studentList['students']
+        student_list = self.database.get_student_list()
         cols = ['student_id', 'name', 'email']
         df = pd.DataFrame(data=student_list, columns=cols)
         self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
@@ -63,15 +53,10 @@ class AdminSubSystem(SubSystem):
         id_list = [d['student_id'] for d in student_list]
         if(student_id in id_list):
             index = id_list.index(student_id)
-            self.studentList['students'].pop(index)
-            try:                
-                with open("data_file.json", 'w') as w:
-                    json.dump(self.studentList, w, indent=4)   
-                    self.print_line("Deleted successfully!")                                 
-            except json.decoder.JSONDecodeError:
-                pass
+            self.database.remove_student(index)
+            self.print_line("Deleted successfully!")
             
-            student_list_after_update = self.studentList['students']
+            student_list_after_update = self.database.get_student_list()
             df = pd.DataFrame(data=student_list_after_update, columns=cols)
             self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
         else:
@@ -114,12 +99,7 @@ class AdminSubSystem(SubSystem):
 
             return pd.DataFrame(enrol_infos)
     
-        try:
-            with open("data_file.json", 'r') as s:                      
-                self.meta_data = json.loads(s.read())
-        except json.decoder.JSONDecodeError:
-            pass
-        student_list = self.meta_data['students']
+        student_list = self.database.get_student_list()
         enrolment_list = flatten_enrolemnts(student_list)
         
         stu_df = pd.DataFrame(data=student_list, columns=['student_id', 'name'])

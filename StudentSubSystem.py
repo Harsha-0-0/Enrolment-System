@@ -1,5 +1,7 @@
 import json
 import random
+import re
+import textwrap
 from colorama import Fore
 import pandas as pd
 from tabulate import tabulate
@@ -34,16 +36,10 @@ class StudentSubSystem(SubSystem):
 
     #Verifying Password criteria
     def verify_student_password(self, password):
-        # adjust the logical order, prevent index out of range
-        letter_count = sum(char.isalpha() for char in password)
-        digit_count = sum(char.isdigit() for char in password)
-
-        if letter_count < 5 or digit_count < 3:
+        if re.match(r"^[A-Z][a-zA-Z]{4,}\d{3,}", password):
+            return True
+        else:
             return False
-        if not password[0].isupper():
-            return False
-
-        return True
 
 
     def register_student_prompt(self):
@@ -61,11 +57,25 @@ class StudentSubSystem(SubSystem):
             if valid_mail and valid_pwd:
                 break
             elif not valid_mail and not valid_pwd:
-                self.print_error('The email address and the password is not valid. Please try again.')
+                invalid_mail_pwd = """
+                The email address and the password does not meet the criteria. Please try again.
+                -> Email should be in the (firstname.lastname@university.com) format.
+                -> Password should (i) Starts with an upper-case character
+                                   (ii) It should contain at least five (5) letters
+                                   (iii) It should contain at least (3) or more digits
+                                 """
+                self.print_error(textwrap.dedent(invalid_mail_pwd))
             elif not valid_mail:
-                self.print_error('The email address is not valid. Please try again.')
+                invalid_mail = """The email address does not meet the criteria. Please try again.
+                                  -> Email should be in the (firstname.lastname@university.com) format."""
+                self.print_error(textwrap.dedent(invalid_mail))
             elif not valid_pwd:
-                self.print_error('The password is not valid. Please try again.')
+                invalid_pwd = """
+                The password does not meet the criteria. Please try again.
+                -> Password should (i) Starts with an upper-case character
+                                   (ii) It should contain at least five (5) letters
+                                   (iii) It should contain at least (3) or more digits""" 
+                self.print_error(textwrap.dedent(invalid_pwd))
 
         #setting values to student
         student.email = self.email
@@ -225,6 +235,11 @@ class StudentSubSystem(SubSystem):
                 else:
                     self.print_error("Failed to change password.")
             else:
-                self.print_error("New password does not meet the criteria.")
+                invalid_pwd = """
+                The password does not meet the criteria. Please try again.
+                -> Password should (i) Starts with an upper-case character
+                                   (ii) It should contain at least five (5) letters
+                                   (iii) It should contain at least (3) or more digits""" 
+                self.print_error(textwrap.dedent(invalid_pwd))
         else:
             self.print_error("Invalid current password.")
