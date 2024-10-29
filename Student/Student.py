@@ -12,7 +12,7 @@ class Student(BaseModel):
     password: Optional[str] = None
     email: Optional[str] = None
     registered_date: Optional[str] = None
-    enrolments: Optional[str] = []
+    enrolments: Optional[str] = None
 
     def set_name(self, name):
         self.name = name

@@ -87,9 +87,13 @@ def on_subjects_view():
     def flatten_enrolemnts(stu_info):
         enrol_infos = []
         for stu in stu_info:
-            for enro in stu['enrolments']:
-                enro['student_id'] = stu['student_id']
-                enrol_infos.append(enro)
+            enrolled_subjects = []
+            if stu.get('enrolments',[]):
+                enrolled_subjects.__iadd__(stu.get('enrolments',[]))
+            for enro in enrolled_subjects:
+                if enro:
+                    enro['student_id'] = stu['student_id']
+                    enrol_infos.append(enro)
 
         return pd.DataFrame(enrol_infos)
 

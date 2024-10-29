@@ -229,7 +229,11 @@ class Database:
 
 
     # TODO - Returns false if no match, don't forget to add self._save_changes_to_data_file()
-    def remove_student(self, student_id: str) -> bool:
+    def remove_student(self, index) -> bool: 
+        if index:
+            self.data['students'].pop(index)
+            self._save_changes_to_data_file()
+            return True
         return False
 
 
