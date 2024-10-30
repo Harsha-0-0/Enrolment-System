@@ -60,6 +60,9 @@ def login_success(email):
     subjects_view_button = tk.Button(frame, text="subjects_view", command=on_subjects_view)
     subjects_view_button.pack(pady=10)
 
+    enrol_button = tk.Button(frame, text="Enrol in Subjects", command=enrol_in_subject)
+    enrol_button.pack(pady=10)
+
     logout_button = tk.Button(frame, text="Logout", command=setup_login_widgets)
     logout_button.pack(pady=15)
     global email_cache
@@ -130,6 +133,76 @@ def on_subjects_view():
     back2login_button = tk.Button(frame, text="back", command=back2login)
     back2login_button.pack(pady=0)
 
+
+def enrol_in_subject():
+    subject_selection_window = tk.Toplevel(root)
+    subject_selection_window.title("Select Subjects to Enrol")
+
+    subject_listbox = Listbox(subject_selection_window, selectmode='multiple', width=50)
+    subject_listbox.pack(pady=20)
+
+    try:
+        with open("data_file.json", 'r') as s:
+            data = json.loads(s.read())
+        student = next((s for s in data['students'] if s['email'] == email_cache), None)
+        enrolled_subjects = student.get('enrolments', [])
+    except (json.decoder.JSONDecodeError, FileNotFoundError):
+        subject_selection_window.destroy()
+        return
+
+    if not enrolled_subjects:
+        enrolled_subjects = []
+
+    if len(enrolled_subjects) >= 4:
+        tk.Label(subject_selection_window, text="You have already enrolled in 4 subjects.").pack(pady=10)
+        return
+
+
+
+    try:
+        with open("data_file.json", 'r') as s:
+            data = json.loads(s.read())
+        
+    except json.decoder.JSONDecodeError:
+        subject_selection_window.destroy()
+        return
+
+    available_subjects = [sub for sub in data.get('subjects', []) if sub['subject_id'] not in [d['subject_id'] for d in enrolled_subjects]]
+    if not available_subjects:
+        tk.Label(subject_selection_window, text="No available subjects to enrol in.").pack(pady=10)
+        return
+
+    for subject in available_subjects:
+        subject_listbox.insert(END, f"{subject['subject_name']} (ID: {subject['subject_id']})")
+
+    def confirm_enrolment():
+        selected_indices = subject_listbox.curselection()
+        for index in selected_indices:
+            if len(enrolled_subjects) < 4:
+                subject_info = available_subjects[index]
+                enrolled_subjects.append({
+                    'subject_id': subject_info['subject_id'],
+                    'subject_name': subject_info['subject_name'],
+                })
+            else:
+                break
+
+        for stu in data['students']:
+            if stu['email'] == email_cache:
+                stu['enrolments'] = enrolled_subjects
+        with open("data_file.json", 'w') as s:
+            json.dump(data, s, indent=4)
+        subject_selection_window.destroy()
+
+    enrol_button = tk.Button(subject_selection_window, text="Enrol", command=confirm_enrolment)
+    enrol_button.pack(pady=10)
+
+    cancel_button = tk.Button(subject_selection_window, text="Cancel", command=subject_selection_window.destroy)
+    cancel_button.pack(pady=5)
+
+
+
+
 def back2login():
     clear_widgets()
     login_success(email_cache)
@@ -173,3 +246,4 @@ listbox = Listbox(root, width=80, height=20)
 setup_login_widgets()
 
 root.mainloop()
+

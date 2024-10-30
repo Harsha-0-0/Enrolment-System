@@ -59,6 +59,23 @@
                     "grade": "HD"
                 }
             ]
+        },
+        {
+            "student_id": "487816",
+            "name": "GUI Tester",
+            "password": "Hello123",
+            "email": "gui.k@university.com",
+            "registered_date": "2024-10-30",
+            "enrolments": [
+                {
+                    "subject_id": "123",
+                    "subject_name": "English"
+                },
+                {
+                    "subject_id": "567",
+                    "subject_name": "Software Development"
+                }
+            ]
         }
     ],
     "subjects": [
