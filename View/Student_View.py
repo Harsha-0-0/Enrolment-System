@@ -124,6 +124,8 @@ def on_subjects_view():
         for index, row in group.iterrows():
             listbox.insert(END, f"Subject ID: {row['subject_id']}")
             listbox.insert(END, f"Subject Name: {row['subject_name']}")
+            listbox.insert(END, f"Mark: {row['mark']}")
+            listbox.insert(END, f"Grade: {grade}")
             listbox.insert(END, "")
     if listbox.size() == 0:
         listbox.insert(END, f"No subjects enrolled")
