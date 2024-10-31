@@ -1,4 +1,5 @@
 import json
+import random
 import tkinter as tk
 import pandas as pd
 from tkinter import Listbox, END
@@ -57,7 +58,7 @@ def login_success(email):
     welcome_label = tk.Label(frame, text=success_message, fg="#7AC5CD")
     welcome_label.pack()
 
-    subjects_view_button = tk.Button(frame, text="subjects_view", command=on_subjects_view)
+    subjects_view_button = tk.Button(frame, text="View enrolled subjects", command=on_subjects_view)
     subjects_view_button.pack(pady=10)
 
     enrol_button = tk.Button(frame, text="Enrol in Subjects", command=enrol_in_subject)
@@ -87,76 +88,72 @@ def display_enrolment_exception():
 
 def on_subjects_view():
     
-    def flatten_enrolemnts(stu_info):
-        enrol_infos = []
-        for stu in stu_info:
-            enrolled_subjects = []
-            if stu.get('enrolments',[]):
-                enrolled_subjects.__iadd__(stu.get('enrolments',[]))
-            for enro in enrolled_subjects:
-                if enro:
-                    enro['student_id'] = stu['student_id']
-                    enrol_infos.append(enro)
-
-        return pd.DataFrame(enrol_infos)
-
-    clear_widgets()
     try:
         with open("data_file.json", 'r') as s:                      
             data = json.loads(s.read())
     except json.decoder.JSONDecodeError:
         pass
+    
+    def flatten_enrolemnts(stu_info):
+        enrol_infos = []
+        student_list = data['students']
+        id_list = [d['student_id'] for d in stu_info]
+        if(student_id_cache in id_list):
+            for i in id_list:
+                if(i == student_id_cache):
+                    index = id_list.index(i)
+                    student = student_list.__getitem__(index)
+
+            enrolled_subjects = []
+            if student.get('enrolments', []):
+                enrolled_subjects.__iadd__(student.get('enrolments', []))
+            for enro in enrolled_subjects:
+                if enro:
+                    enro['student_id'] = student['student_id']
+                    enrol_infos.append(enro)
+            
+        return pd.DataFrame(enrol_infos)
+
 
     student_list = data['students']
     enrolment_list = flatten_enrolemnts(student_list)
 
-    stu_df = pd.DataFrame(data=student_list, columns=['student_id', 'name'])
-    enrol_df = pd.DataFrame(data=enrolment_list, columns=['student_id', 'subject_name', 'subject_id', 'grade', 'mark'])
-    merge_df = pd.merge(stu_df, enrol_df, on='student_id',how='right')
-    merge_df = merge_df[merge_df['student_id'] == student_id_cache]
-    
-    # subjects_view_button = tk.Button(frame, text="subjects_view", command=on_subjects_view)
-    # subjects_view_button.pack(pady=10)
-    
+    subject_list_window = tk.Toplevel(root)
+    listbox = Listbox(subject_list_window, width=100, height=20)
     listbox.pack(padx=20, pady=20)
-
-    for grade, group in merge_df.groupby('grade'):
-        for index, row in group.iterrows():
-            listbox.insert(END, f"Subject ID: {row['subject_id']}")
-            listbox.insert(END, f"Subject Name: {row['subject_name']}")
-            listbox.insert(END, f"Mark: {row['mark']}")
-            listbox.insert(END, f"Grade: {grade}")
-            listbox.insert(END, "")
+    
+    for index, row in enrolment_list.iterrows():
+        listbox.insert(END, f"Subject ID: {row['subject_id']}")
+        listbox.insert(END, f"Subject Name: {row['subject_name']}")
+        listbox.insert(END, f"Mark: {row['mark']}")
+        listbox.insert(END, f"Grade: {row['grade']}")
+        listbox.insert(END, "")
     if listbox.size() == 0:
-        listbox.insert(END, f"No subjects enrolled")
-
-    back2login_button = tk.Button(frame, text="back", command=back2login)
-    back2login_button.pack(pady=0)
+        tk.Label(subject_list_window, text="No subjects enrolled.", fg="red").pack(pady=10)
+        
+    close_button = tk.Button(subject_list_window, text="Close", command=subject_list_window.destroy)
+    close_button.pack(pady=5)
 
 
 def enrol_in_subject():
-    subject_selection_window = tk.Toplevel(root)
-    subject_selection_window.title("Select Subjects to Enrol")
-
-    subject_listbox = Listbox(subject_selection_window, selectmode='multiple', width=50)
-    subject_listbox.pack(pady=20)
-
     try:
         with open("data_file.json", 'r') as s:
             data = json.loads(s.read())
         student = next((s for s in data['students'] if s['email'] == email_cache), None)
         enrolled_subjects = student.get('enrolments', [])
     except (json.decoder.JSONDecodeError, FileNotFoundError):
-        subject_selection_window.destroy()
         return
-
     if not enrolled_subjects:
-        enrolled_subjects = []
-
+        enrolled_subjects = []     
     if len(enrolled_subjects) >= 4:
-        tk.Label(subject_selection_window, text="You have already enrolled in 4 subjects.").pack(pady=10)
+        display_enrolment_exception()
         return
+    
+    subject_selection_window = tk.Toplevel(root)
+    subject_selection_window.title("Select Subjects to Enrol")
 
+    subject_listbox = Listbox(subject_selection_window, selectmode='multiple', width=50)
+    subject_listbox.pack(pady=20)
 
 
     try:
@@ -179,10 +176,14 @@ def enrol_in_subject():
         selected_indices = subject_listbox.curselection()
         for index in selected_indices:
             if len(enrolled_subjects) < 4:
+                random_mark = random.randint(25, 100)
+                grade = _calculate_grade(random_mark)
                 subject_info = available_subjects[index]
                 enrolled_subjects.append({
                     'subject_id': subject_info['subject_id'],
                     'subject_name': subject_info['subject_name'],
+                    'mark': random_mark,
+                    'grade': grade
                 })
             else:
                 break
@@ -199,19 +200,26 @@ def enrol_in_subject():
 
     cancel_button = tk.Button(subject_selection_window, text="Cancel", command=subject_selection_window.destroy)
     cancel_button.pack(pady=5)
+    
+    def _calculate_grade(mark):
+        if mark < 50:
+            return 'Z'
+        elif 50 <= mark < 65:
+            return 'P'
+        elif 65 <= mark < 75:
+            return 'C'
+        elif 75 <= mark < 85:
+            return 'D'
+        else:
+            return 'HD'
 
 
 
 
-def back2login():
-    clear_widgets()
-    login_success(email_cache)
 
 def clear_widgets():
     for widget in frame.winfo_children():
         widget.destroy()
-    if listbox.size() != 0:
-        listbox.delete(0, tk.END)
 
 def setup_login_widgets():
     clear_widgets()
@@ -241,7 +249,6 @@ root.configure(bg='#7AC5CD')
 frame = tk.Frame(root)
 frame.pack(expand=True)
 
-listbox = Listbox(root, width=80, height=20)
 
 setup_login_widgets()
 
