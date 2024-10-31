@@ -1,6 +1,4 @@
-import json
 import random
-import re
 import textwrap
 from colorama import Fore
 import pandas as pd

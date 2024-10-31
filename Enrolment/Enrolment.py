@@ -1,4 +1,3 @@
-import datetime
 import random
 from pydantic import BaseModel
 

@@ -1,4 +1,3 @@
-import json
 from colorama import Fore
 import pandas as pd
 from tabulate import tabulate

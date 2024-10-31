@@ -3,8 +3,6 @@ import re
 from typing import Optional
 from pydantic import BaseModel
 
-import Database
-
 
 class Student(BaseModel):
     student_id: Optional[str] = None

@@ -3,11 +3,8 @@ import json
 import os
 import random
 from typing import List
-from pydantic import BaseModel
-from Enrolment.Enrolment import Enrolment
 from Student.Student import Student
 from Subject.Subject import Subject
-import numpy as np
 
 
 class Database:
