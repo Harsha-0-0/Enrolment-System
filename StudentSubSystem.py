@@ -149,7 +149,7 @@ class StudentSubSystem(SubSystem):
         self.print_line("You are currently enrolled in the following subjects:")
         cols = ['subject_id', 'subject_name']
         df = pd.DataFrame(data=enrolled_subjects, columns=cols)
-        self.print_line(tabulate(df, tablefmt="github", headers=["Subject ID", "Subject Name"]))
+        self.print_line(tabulate(df, tablefmt="pretty", headers=["Subject ID", "Subject Name"]))
 
     # UserStory-201, Automatically Enrol in subjects
 

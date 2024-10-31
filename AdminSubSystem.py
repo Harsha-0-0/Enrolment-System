@@ -41,7 +41,7 @@ class AdminSubSystem(SubSystem):
         # TO show only selected columns, used Pandas, Dataframe
         cols = ['student_id', 'name', 'email']
         df = pd.DataFrame(data=student_list, columns=cols)
-        self.print_line(tabulate(df, tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
+        self.print_line(tabulate(df, tablefmt="pretty", headers=["Student ID", "Student Name", "Email ID"]))
 
     # TODO UserStory-404, Remove individual students from the system
     def remove_student_prompt(self):
@@ -49,7 +49,7 @@ class AdminSubSystem(SubSystem):
         student_list = self.database.get_student_list()
         cols = ['student_id', 'name', 'email']
         df = pd.DataFrame(data=student_list, columns=cols)
-        self.print_line(tabulate(df, tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
+        self.print_line(tabulate(df, tablefmt="pretty", headers=["Student ID", "Student Name", "Email ID"]))
         student_id = input('Enter the ID of student you want to delete: ')
         id_list = [d['student_id'] for d in student_list]
         if (student_id in id_list):
@@ -59,7 +59,7 @@ class AdminSubSystem(SubSystem):
 
             student_list_after_update = self.database.get_student_list()
             df = pd.DataFrame(data=student_list_after_update, columns=cols)
-            self.print_line(tabulate(df, tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
+            self.print_line(tabulate(df, tablefmt="pretty", headers=["Student ID", "Student Name", "Email ID"]))
         else:
             self.print_error(f"Student ID {student_id} does not exist.")
 
