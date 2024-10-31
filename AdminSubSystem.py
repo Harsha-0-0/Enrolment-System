@@ -1,7 +1,7 @@
 import json
 from colorama import Fore
 import pandas as pd
-from tabulate import tabulate 
+from tabulate import tabulate
 from Database import Database
 from SubSystem import SubSystem
 from Subject.Subject import Subject
@@ -39,10 +39,10 @@ class AdminSubSystem(SubSystem):
     # TODO UserStory-401 @Harsha, View list of all registered students
     def view_all_student_prompt(self):
         student_list = self.database.get_student_list()
-        # TO show only selected columns, used Pandas, Dataframe 
+        # TO show only selected columns, used Pandas, Dataframe
         cols = ['student_id', 'name', 'email']
-        df = pd.DataFrame(data=student_list, columns=cols)        
-        self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
+        df = pd.DataFrame(data=student_list, columns=cols)
+        self.print_line(tabulate(df, tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
 
     # TODO UserStory-404, Remove individual students from the system
     def remove_student_prompt(self):
@@ -50,17 +50,17 @@ class AdminSubSystem(SubSystem):
         student_list = self.database.get_student_list()
         cols = ['student_id', 'name', 'email']
         df = pd.DataFrame(data=student_list, columns=cols)
-        self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
+        self.print_line(tabulate(df, tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
         student_id = input('Enter the ID of student you want to delete: ')
         id_list = [d['student_id'] for d in student_list]
-        if(student_id in id_list):
+        if (student_id in id_list):
             index = id_list.index(student_id)
             self.database.remove_student(index)
             self.print_line("Deleted successfully!")
-            
+
             student_list_after_update = self.database.get_student_list()
             df = pd.DataFrame(data=student_list_after_update, columns=cols)
-            self.print_line(tabulate(df , tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
+            self.print_line(tabulate(df, tablefmt="github", headers=["Student ID", "Student Name", "Email ID"]))
         else:
             self.print_error(f"Student ID {student_id} does not exist.")
 
@@ -96,34 +96,34 @@ class AdminSubSystem(SubSystem):
             enrol_infos = []
             for stu in stu_info:
                 enrolled_subjects = []
-                if stu.get('enrolments',[]):
-                    enrolled_subjects.__iadd__(stu.get('enrolments',[]))
+                if stu.get('enrolments', []):
+                    enrolled_subjects.__iadd__(stu.get('enrolments', []))
                 for enro in enrolled_subjects:
                     if enro:
                         enro['student_id'] = stu['student_id']
                         enrol_infos.append(enro)
 
             return pd.DataFrame(enrol_infos)
-    
+
         student_list = self.database.get_student_list()
         enrolment_list = flatten_enrolemnts(student_list)
-        
+
         stu_df = pd.DataFrame(data=student_list, columns=['student_id', 'name'])
         enrol_df = pd.DataFrame(data=enrolment_list, columns=['student_id', 'subject_id', 'grade', 'mark'])
-        merge_df = pd.merge(stu_df, enrol_df, on='student_id',how='right')
-        
+        merge_df = pd.merge(stu_df, enrol_df, on='student_id', how='right')
 
         for gradegroup in merge_df.groupby('grade'):
             print('{:-^10}'.format(gradegroup[0]))
-            self.print_line(tabulate(gradegroup[1], headers=['name', 'student_id', 'subject_id', 'grade', 'mark'], tablefmt="pretty"))
-    
-    def partition_students(self): 
+            self.print_line(tabulate(gradegroup[1], headers=['name', 'student_id',
+                            'subject_id', 'grade', 'mark'], tablefmt="pretty"))
+
+    def partition_students(self):
         def flatten_enrolemnts(stu_info):
             enrol_infos = []
             for stu in stu_info:
                 enrolled_subjects = []
-                if stu.get('enrolments',[]):
-                    enrolled_subjects.__iadd__(stu.get('enrolments',[]))
+                if stu.get('enrolments', []):
+                    enrolled_subjects.__iadd__(stu.get('enrolments', []))
                 for enro in enrolled_subjects:
                     if enro:
                         grade = enro['grade']
@@ -132,23 +132,25 @@ class AdminSubSystem(SubSystem):
                         enrol_infos.append(enro)
 
             return pd.DataFrame(enrol_infos)
-               
+
         def partition(grade):
             if grade == 'Z':
                 partition = 'FAIL'
             else:
                 partition = 'PASS'
             return partition
-        
+
         student_list = self.database.get_student_list()
         enrolment_list = flatten_enrolemnts(student_list)
 
         stu_df = pd.DataFrame(data=student_list, columns=['student_id', 'name'])
-        enrol_df = pd.DataFrame(data=enrolment_list, columns=['student_id', 'subject_id', 'subject_name', 'grade', 'mark', 'partition'])
-        merge_df = pd.merge(stu_df, enrol_df, on='student_id',how='right')
+        enrol_df = pd.DataFrame(data=enrolment_list, columns=[
+                                'student_id', 'subject_id', 'subject_name', 'grade', 'mark', 'partition'])
+        merge_df = pd.merge(stu_df, enrol_df, on='student_id', how='right')
         for partition_group in merge_df.groupby('partition'):
             print('{:-^10}'.format(partition_group[0]))
-            self.print_line(tabulate(partition_group[1], headers=['Student Id', 'Name', 'Subject Id', 'Subject Name', 'Grade', 'Mark', 'Pass/Fail'], tablefmt="pretty"))
+            self.print_line(tabulate(partition_group[1], headers=[
+                            'Student Id', 'Name', 'Subject Id', 'Subject Name', 'Grade', 'Mark', 'Pass/Fail'], tablefmt="pretty"))
 
     # TODO UserStory-405, Clear the entire students.data file from the system
     def clear_database_prompt(self):
