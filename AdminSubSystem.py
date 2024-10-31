@@ -54,8 +54,7 @@ class AdminSubSystem(SubSystem):
         student_id = input('Enter the ID of student you want to delete: ')
         id_list = [d['student_id'] for d in student_list]
         if(student_id in id_list):
-            index = id_list.index(student_id)
-            self.database.remove_student(index)
+            self.database.remove_student(student_id)
             self.print_line("Deleted successfully!")
             
             student_list_after_update = self.database.get_student_list()

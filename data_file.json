@@ -8,29 +8,35 @@
             "registered_date": "2024-10-25",
             "enrolments": [
                 {
+                    "subject_id": "123",
+                    "subject_name": "English",
+                    "mark": 37,
+                    "grade": "Z"
+                },
+                {
+                    "subject_id": "103",
+                    "subject_name": "Math",
+                    "mark": 48,
+                    "grade": "Z"
+                },
+                {
                     "subject_id": "567",
                     "subject_name": "Software Development",
-                    "mark": 34,
-                    "grade": "Z"
+                    "mark": 90,
+                    "grade": "HD"
                 },
                 {
                     "subject_id": "001",
                     "subject_name": "Science",
-                    "mark": 72,
-                    "grade": "C"
-                },
-                {
-                    "subject_id": "123",
-                    "subject_name": "English",
-                    "mark": 91,
-                    "grade": "HD"
+                    "mark": 49,
+                    "grade": "Z"
                 }
             ]
         },
         {
             "student_id": "560350",
             "name": "Dahye",
-            "password": "Hello@123",
+            "password": "Hello123",
             "email": "dh.k@university.com",
             "registered_date": "2024-10-25",
             "enrolments": [
@@ -68,12 +74,16 @@
             "registered_date": "2024-10-30",
             "enrolments": [
                 {
-                    "subject_id": "123",
-                    "subject_name": "English"
+                    "subject_id": "567",
+                    "subject_name": "Software Development",
+                    "mark": 26,
+                    "grade": "Z"
                 },
                 {
-                    "subject_id": "567",
-                    "subject_name": "Software Development"
+                    "subject_id": "001",
+                    "subject_name": "Science",
+                    "mark": 82,
+                    "grade": "D"
                 }
             ]
         }
