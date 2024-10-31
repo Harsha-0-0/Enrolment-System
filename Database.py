@@ -41,10 +41,10 @@ class Database:
         self.data['students'].append(student.model_dump())
         self._save_changes_to_data_file()
 
-    # To fetch all the data from data_file.json
+    # To fetch all the data from json
     def get_data(self):
         try:
-            with open("data_file.json", 'r') as s:
+            with open(self.db_file_name, 'r') as s:
                 self.studentList = json.loads(s.read())
                 return self.studentList
         except json.decoder.JSONDecodeError:

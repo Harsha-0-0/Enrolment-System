@@ -72,7 +72,7 @@ class StudentSubSystem(SubSystem):
         student.password = self.password
         student.set_name(self.name)
 
-        # Check if student exists. If it is a new email, create generate student id and add to the data_file.json file
+        # Check if student exists. If it is a new email, create generate student id and add to the json file
         student_list = self.database.get_student_list()
         email_list = [d['email'] for d in student_list]
 
